@@ -1,6 +1,6 @@
 # SpyEngine
 
-C++20 game engine: Vulkan renderer, ECS world, editor, standalone runtime, and the `khmer_survivors` game.
+C++20 game engine: Vulkan renderer, ECS world, editor, standalone runtime, and the `fruit_spin` game.
 
 ## Build
 

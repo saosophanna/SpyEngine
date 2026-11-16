@@ -23,7 +23,7 @@ if(SPY_BUILD_EDITOR)
 endif()
 
 if(SPY_BUILD_GAMES)
-    add_subdirectory(games/khmer_survivors)
+    add_subdirectory(games/fruit_spin)
 endif()
 
 if(SPY_BUILD_TESTS)
