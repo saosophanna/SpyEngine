@@ -6,6 +6,7 @@
 #include <memory>
 #include <string_view>
 
+#include "core/time/frame_limiter.hpp"
 #include "platform/window/window.hpp"
 #include "renderer/camera/camera2d.hpp"
 #include "renderer/renderer.hpp"
@@ -34,6 +35,7 @@ std::filesystem::path executableDirectory(const char* argument)
 int main(int argc, char** argv)
 {
     int frameLimit = 0;
+    int maxFps = 0;
 
     for (int index = 1; index < argc; ++index)
     {
@@ -43,6 +45,21 @@ int main(int argc, char** argv)
         {
             frameLimit = std::atoi(argv[++index]);
         }
+        else if (argument == "--max-fps" && index + 1 < argc)
+        {
+            maxFps = std::atoi(argv[++index]);
+        }
+    }
+
+    spy::time::FrameLimiter frameLimiter;
+
+    if (maxFps > 0)
+    {
+        frameLimiter.setTargetFps(static_cast<spy::uint32>(maxFps));
+    }
+    else
+    {
+        frameLimiter.setUnlimited();
     }
 
     const std::filesystem::path root = executableDirectory(argv[0]);
@@ -129,8 +146,13 @@ int main(int argc, char** argv)
     int exitCode = 0;
     bool running = true;
 
+    const float deltaCeiling =
+        maxFps > 0 ? std::max(0.05f, 1.25f / static_cast<float>(maxFps)) : 0.05f;
+
     while (running)
     {
+        frameLimiter.beginFrame();
+
         if (!window.pollEvents())
         {
             break;
@@ -146,6 +168,7 @@ int main(int argc, char** argv)
 
         if (width == 0 || height == 0)
         {
+            frameLimiter.endFrame();
             continue;
         }
 
@@ -163,7 +186,7 @@ int main(int argc, char** argv)
         const auto now = std::chrono::steady_clock::now();
         float deltaTime = std::chrono::duration<float>(now - previous).count();
         previous = now;
-        deltaTime = std::clamp(deltaTime, 0.0f, 0.05f);
+        deltaTime = std::clamp(deltaTime, 0.0f, deltaCeiling);
 
         scene.update(deltaTime, window);
 
@@ -192,6 +215,8 @@ int main(int argc, char** argv)
         {
             running = false;
         }
+
+        frameLimiter.endFrame();
     }
 
     renderContext->waitIdle();
