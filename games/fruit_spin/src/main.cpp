@@ -1,11 +1,11 @@
 #include <algorithm>
-#include <chrono>
-#include <cstdio>
 #include <cstdlib>
 #include <filesystem>
 #include <memory>
 #include <string_view>
 
+#include "core/logging/log_macros.hpp"
+#include "core/time/clock.hpp"
 #include "core/time/frame_limiter.hpp"
 #include "platform/window/window.hpp"
 #include "renderer/camera/camera2d.hpp"
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
 
     if (!window.create(windowDesc))
     {
-        std::fprintf(stderr, "fruit_spin: window creation failed\n");
+        SPY_LOG_ERROR("fruit_spin: window creation failed");
         return 1;
     }
 
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 
     if (device == nullptr)
     {
-        std::fprintf(stderr, "fruit_spin: Vulkan backend unavailable\n");
+        SPY_LOG_ERROR("fruit_spin: Vulkan backend unavailable");
         return 1;
     }
 
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
     if (!device->initialize(deviceDesc))
     {
-        std::fprintf(stderr, "fruit_spin: device initialization failed\n");
+        SPY_LOG_ERROR("fruit_spin: device initialization failed");
         return 1;
     }
 
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 
     if (renderContext == nullptr)
     {
-        std::fprintf(stderr, "fruit_spin: render context creation failed\n");
+        SPY_LOG_ERROR("fruit_spin: render context creation failed");
         device->shutdown();
         return 1;
     }
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
                                    (shaderDirectory / "sprite.vert.spv").string(),
                                    (shaderDirectory / "sprite.frag.spv").string()))
     {
-        std::fprintf(stderr, "fruit_spin: sprite renderer initialization failed\n");
+        SPY_LOG_ERROR("fruit_spin: sprite renderer initialization failed");
         device->shutdown();
         return 1;
     }
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 
     if (!scene.initialize(spriteRenderer, (root / "assets").string()))
     {
-        std::fprintf(stderr, "fruit_spin: game initialization failed\n");
+        SPY_LOG_ERROR("fruit_spin: game initialization failed");
         spriteRenderer.shutdown();
         device->shutdown();
         return 1;
@@ -141,7 +141,7 @@ int main(int argc, char** argv)
     spy::renderer::Camera2D camera(static_cast<float>(window.width()),
                                    static_cast<float>(window.height()));
 
-    auto previous = std::chrono::steady_clock::now();
+    double previous = spy::time::Clock::nowSeconds();
     int frameCount = 0;
     int exitCode = 0;
     bool running = true;
@@ -183,8 +183,8 @@ int main(int argc, char** argv)
             camera.resize(static_cast<float>(width), static_cast<float>(height));
         }
 
-        const auto now = std::chrono::steady_clock::now();
-        float deltaTime = std::chrono::duration<float>(now - previous).count();
+        const double now = spy::time::Clock::nowSeconds();
+        float deltaTime = static_cast<float>(now - previous);
         previous = now;
         deltaTime = std::clamp(deltaTime, 0.0f, deltaCeiling);
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <filesystem>
 
 #include "assets/image/png_decoder.hpp"
@@ -21,6 +22,7 @@ namespace
 
 constexpr float kDesignWidth = 1280.0f;
 constexpr float kDesignHeight = 720.0f;
+constexpr std::size_t kEntityMemoryCapacity = 1u << 20u;
 
 constexpr float kCellSize = 150.0f;
 constexpr float kCellGap = 12.0f;
@@ -106,6 +108,12 @@ void drawDesignBar(spy::renderer::SpriteRenderer& renderer,
                      rotation);
 }
 
+}
+
+GameScene::GameScene()
+    : m_memory(kEntityMemoryCapacity)
+    , m_registry(m_memory)
+{
 }
 
 bool GameScene::initialize(spy::renderer::SpriteRenderer& renderer,

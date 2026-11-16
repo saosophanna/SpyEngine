@@ -18,6 +18,8 @@ Presets: `windows-msvc`, `windows-ninja`, `linux-ninja`. Binaries land in `build
 - No documentation files for code. No API markdown, no design notes, no per-module READMEs.
 - Keep `README.md` to build instructions only.
 - Every change must leave `cmake --build` and `ctest` green.
+- Reuse the modules already in `engine/` before adding a replacement: memory, containers, math, time, logging, events, ECS, assets, renderer, platform. Add a new abstraction only when no existing module covers the need.
+- Dependencies point downward only. Foundation and utility code never includes platform, renderer, ECS, or game headers.
 
 ## Conventions
 

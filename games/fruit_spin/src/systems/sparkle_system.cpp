@@ -1,15 +1,14 @@
 #include "systems/sparkle_system.hpp"
 
-#include <vector>
-
 #include "components/sparkle.hpp"
+#include "core/utilities/containers/small_vector.hpp"
 
 namespace fruit_spin
 {
 
 void updateSparkles(spy::ecs::Registry& registry, float deltaTime)
 {
-    std::vector<spy::ecs::Entity> expired;
+    spy::SmallVector<spy::ecs::Entity, 64> expired;
 
     registry.each<Sparkle>(
         [&](spy::ecs::Entity entity, Sparkle& sparkle)
@@ -21,7 +20,7 @@ void updateSparkles(spy::ecs::Registry& registry, float deltaTime)
 
             if (sparkle.age >= sparkle.lifetime)
             {
-                expired.push_back(entity);
+                expired.pushBack(entity);
             }
         });
 

@@ -6,6 +6,7 @@
 
 #include "core/math/common/random.hpp"
 #include "core/math/vector/vec2.hpp"
+#include "core/memory/allocators/free_list_allocator.hpp"
 #include "ecs/ecs.hpp"
 #include "gameplay/game_state.hpp"
 
@@ -32,7 +33,7 @@ public:
         float offsetY = 0.0f;
     };
 
-    GameScene() = default;
+    GameScene();
 
     [[nodiscard]] bool initialize(spy::renderer::SpriteRenderer& renderer,
                                   std::string_view assetsDirectory);
@@ -52,6 +53,7 @@ private:
     void renderSparkles(spy::renderer::SpriteRenderer& renderer, const Layout& layout);
 
     GameState m_state;
+    spy::memory::FreeListAllocator m_memory;
     spy::ecs::Registry m_registry;
     spy::math::Random m_random;
     float m_time = 0.0f;
