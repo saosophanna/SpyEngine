@@ -2,30 +2,40 @@
 
 #include <cstdint>
 
-namespace spy::rhi {
+#include "rhi/command_buffer.hpp"
+#include "rhi/native_window.hpp"
+#include "rhi/swapchain.hpp"
 
-class CommandBuffer;
+namespace spy::rhi
+{
 
-class RenderContext {
+class RenderContext
+{
 public:
     virtual ~RenderContext() = default;
 
-    RenderContext(const RenderContext&)            = delete;
+    RenderContext(const RenderContext&) = delete;
     RenderContext& operator=(const RenderContext&) = delete;
 
-    virtual bool createSurface(void* nativeWindowHandle) = 0;
-    virtual bool resize(std::uint32_t width, std::uint32_t height) = 0;
+    [[nodiscard]] virtual bool initialize(const NativeWindow& window,
+                                          std::uint32_t width,
+                                          std::uint32_t height,
+                                          bool vsync) = 0;
+    virtual void shutdown() = 0;
 
-    virtual bool beginFrame() = 0;
-    virtual bool endFrame()   = 0;
+    [[nodiscard]] virtual bool resize(std::uint32_t width, std::uint32_t height) = 0;
+    [[nodiscard]] virtual bool beginFrame() = 0;
+    [[nodiscard]] virtual bool endFrame() = 0;
 
     virtual void waitIdle() = 0;
 
-    [[nodiscard]] virtual std::uint32_t width()      const = 0;
-    [[nodiscard]] virtual std::uint32_t height()     const = 0;
+    [[nodiscard]] virtual std::uint32_t width() const = 0;
+    [[nodiscard]] virtual std::uint32_t height() const = 0;
     [[nodiscard]] virtual std::uint32_t imageCount() const = 0;
+    [[nodiscard]] virtual std::uint32_t currentFrameIndex() const = 0;
 
     [[nodiscard]] virtual CommandBuffer& currentCommandBuffer() = 0;
+    [[nodiscard]] virtual Swapchain& swapchain() = 0;
 
 protected:
     RenderContext() = default;
