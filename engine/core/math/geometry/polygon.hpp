@@ -7,6 +7,7 @@
 #include "core/math/common/math_utils.hpp"
 #include "core/math/geometry/rect.hpp"
 #include "core/math/vector/vec2.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
@@ -14,16 +15,16 @@ struct Polygon
 {
     std::vector<Vec2> vertices;
 
-    [[nodiscard]] float signedArea() const
+    [[nodiscard]] float32 signedArea() const
     {
         if (vertices.size() < 3)
         {
             return 0.0f;
         }
 
-        float doubledArea = 0.0f;
+        float32 doubledArea = 0.0f;
 
-        for (std::size_t index = 0; index < vertices.size(); ++index)
+        for (usize index = 0; index < vertices.size(); ++index)
         {
             const Vec2& current = vertices[index];
             const Vec2& next = vertices[(index + 1) % vertices.size()];
@@ -33,7 +34,7 @@ struct Polygon
         return doubledArea * 0.5f;
     }
 
-    [[nodiscard]] float area() const
+    [[nodiscard]] float32 area() const
     {
         return absValue(signedArea());
     }
@@ -54,17 +55,17 @@ struct Polygon
                 sum += vertex;
             }
 
-            return sum / static_cast<float>(vertices.size());
+            return sum / static_cast<float32>(vertices.size());
         }
 
-        const float areaValue = signedArea();
+        const float32 areaValue = signedArea();
         Vec2 accumulated = Vec2::zero();
 
-        for (std::size_t index = 0; index < vertices.size(); ++index)
+        for (usize index = 0; index < vertices.size(); ++index)
         {
             const Vec2& current = vertices[index];
             const Vec2& next = vertices[(index + 1) % vertices.size()];
-            const float cross = current.cross(next);
+            const float32 cross = current.cross(next);
             accumulated += (current + next) * cross;
         }
 
@@ -77,22 +78,22 @@ struct Polygon
                 sum += vertex;
             }
 
-            return sum / static_cast<float>(vertices.size());
+            return sum / static_cast<float32>(vertices.size());
         }
 
         return accumulated / (6.0f * areaValue);
     }
 
-    [[nodiscard]] float perimeter() const
+    [[nodiscard]] float32 perimeter() const
     {
         if (vertices.size() < 2)
         {
             return 0.0f;
         }
 
-        float total = 0.0f;
+        float32 total = 0.0f;
 
-        for (std::size_t index = 0; index < vertices.size(); ++index)
+        for (usize index = 0; index < vertices.size(); ++index)
         {
             const Vec2& current = vertices[index];
             const Vec2& next = vertices[(index + 1) % vertices.size()];
@@ -130,7 +131,7 @@ struct Polygon
 
         bool inside = false;
 
-        for (std::size_t index = 0, previous = vertices.size() - 1; index < vertices.size();
+        for (usize index = 0, previous = vertices.size() - 1; index < vertices.size();
              previous = index++)
         {
             const Vec2& current = vertices[index];
@@ -148,7 +149,7 @@ struct Polygon
 
             if (crossesVerticalRange)
             {
-                const float intersectionX =
+                const float32 intersectionX =
                     (prior.x - current.x) * (point.y - current.y) / (prior.y - current.y) +
                     current.x;
 

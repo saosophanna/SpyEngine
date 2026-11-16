@@ -2,6 +2,7 @@
 
 #include "core/math/common/math_utils.hpp"
 #include "core/math/vector/vec3.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
@@ -25,7 +26,7 @@ struct Aabb
         return max - min;
     }
 
-    [[nodiscard]] constexpr float volume() const
+    [[nodiscard]] constexpr float32 volume() const
     {
         const Vec3 dimensions = size();
 
@@ -63,7 +64,7 @@ struct Aabb
                          maxValue(max.z, other.max.z)}};
     }
 
-    [[nodiscard]] constexpr Aabb expanded(float amount) const
+    [[nodiscard]] constexpr Aabb expanded(float32 amount) const
     {
         return Aabb{Vec3{min.x - amount, min.y - amount, min.z - amount},
                     Vec3{max.x + amount, max.y + amount, max.z + amount}};

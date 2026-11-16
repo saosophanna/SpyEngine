@@ -3,6 +3,8 @@
 #include <chrono>
 #include <cstdint>
 
+#include "core/utilities/types/types.hpp"
+
 namespace spy::time {
 
 class Clock
@@ -16,13 +18,13 @@ public:
 
     void reset();
 
-    [[nodiscard]] double elapsedSeconds() const;
-    [[nodiscard]] double elapsedMilliseconds() const;
-    [[nodiscard]] std::uint64_t elapsedNanoseconds() const;
+    [[nodiscard]] float64 elapsedSeconds() const;
+    [[nodiscard]] float64 elapsedMilliseconds() const;
+    [[nodiscard]] uint64 elapsedNanoseconds() const;
 
     [[nodiscard]] static TimePoint now() noexcept;
-    [[nodiscard]] static double nowSeconds();
-    [[nodiscard]] static std::uint64_t nowNanoseconds();
+    [[nodiscard]] static float64 nowSeconds();
+    [[nodiscard]] static uint64 nowNanoseconds();
 
 private:
     TimePoint m_start;

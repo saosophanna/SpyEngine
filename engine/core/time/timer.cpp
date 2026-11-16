@@ -3,10 +3,11 @@
 #include <limits>
 
 #include "core/time/timer.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::time {
 
-Timer::Timer(double duration, bool repeating)
+Timer::Timer(float64 duration, bool repeating)
     : m_duration(std::isfinite(duration) && duration > 0.0 ? duration : 0.0)
     , m_repeating(repeating)
 {
@@ -50,7 +51,7 @@ void Timer::resume()
     }
 }
 
-std::uint32_t Timer::tick(double deltaTime)
+uint32 Timer::tick(float64 deltaTime)
 {
     if (!m_running || m_paused)
     {
@@ -85,12 +86,12 @@ std::uint32_t Timer::tick(double deltaTime)
         return 1;
     }
 
-    const double rawIntervals = std::floor(m_elapsed / m_duration);
-    const double intervalLimit = static_cast<double>(std::numeric_limits<std::uint32_t>::max());
-    const double intervalCount = rawIntervals < intervalLimit ? rawIntervals : intervalLimit;
-    const auto intervals = static_cast<std::uint32_t>(intervalCount);
+    const float64 rawIntervals = std::floor(m_elapsed / m_duration);
+    const float64 intervalLimit = static_cast<float64>(std::numeric_limits<uint32>::max());
+    const float64 intervalCount = rawIntervals < intervalLimit ? rawIntervals : intervalLimit;
+    const auto intervals = static_cast<uint32>(intervalCount);
 
-    m_elapsed -= static_cast<double>(intervals) * m_duration;
+    m_elapsed -= static_cast<float64>(intervals) * m_duration;
 
     if (m_elapsed >= m_duration)
     {
@@ -115,34 +116,34 @@ bool Timer::isFinished() const noexcept
     return m_finished;
 }
 
-double Timer::duration() const noexcept
+float64 Timer::duration() const noexcept
 {
     return m_duration;
 }
 
-double Timer::elapsed() const noexcept
+float64 Timer::elapsed() const noexcept
 {
     return m_elapsed;
 }
 
-double Timer::remaining() const noexcept
+float64 Timer::remaining() const noexcept
 {
-    const double value = m_duration - m_elapsed;
+    const float64 value = m_duration - m_elapsed;
     return value > 0.0 ? value : 0.0;
 }
 
-double Timer::progress() const noexcept
+float64 Timer::progress() const noexcept
 {
     if (!(m_duration > 0.0))
     {
         return 1.0;
     }
 
-    const double value = m_elapsed / m_duration;
+    const float64 value = m_elapsed / m_duration;
     return value < 1.0 ? value : 1.0;
 }
 
-void Timer::setDuration(double duration)
+void Timer::setDuration(float64 duration)
 {
     m_duration = std::isfinite(duration) && duration > 0.0 ? duration : 0.0;
 }

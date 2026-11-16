@@ -4,33 +4,32 @@
 #include <source_location>
 
 #include "core/memory/allocation.hpp"
+#include "core/utilities/memory/non_copyable.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
 struct AllocationRecord
 {
     void* address = nullptr;
-    std::size_t size = 0;
-    std::size_t alignment = 0;
+    usize size = 0;
+    usize alignment = 0;
     std::source_location location{};
 };
 
-class AllocationTracker
+class AllocationTracker : public NonCopyable
 {
 public:
-    static constexpr std::size_t kDefaultCapacity = 1024;
-    static constexpr std::size_t kReleaseHistoryCapacity = 16;
+    static constexpr usize kDefaultCapacity = 1024;
+    static constexpr usize kReleaseHistoryCapacity = 16;
 
-    explicit AllocationTracker(std::size_t capacity = kDefaultCapacity);
+    explicit AllocationTracker(usize capacity = kDefaultCapacity);
     ~AllocationTracker();
-
-    AllocationTracker(const AllocationTracker&) = delete;
-    AllocationTracker& operator=(const AllocationTracker&) = delete;
 
     [[nodiscard]] bool track(
         void* address,
-        std::size_t size,
-        std::size_t alignment = kDefaultAlignment,
+        usize size,
+        usize alignment = kDefaultAlignment,
         std::source_location location = std::source_location::current()) noexcept;
 
     [[nodiscard]] bool release(void* address) noexcept;
@@ -38,11 +37,11 @@ public:
     [[nodiscard]] const AllocationRecord* find(void* address) const noexcept;
     [[nodiscard]] bool contains(void* address) const noexcept;
 
-    [[nodiscard]] std::size_t liveCount() const noexcept;
-    [[nodiscard]] std::size_t liveBytes() const noexcept;
-    [[nodiscard]] std::size_t capacity() const noexcept;
-    [[nodiscard]] std::size_t overflowCount() const noexcept;
-    [[nodiscard]] std::size_t invalidReleaseCount() const noexcept;
+    [[nodiscard]] usize liveCount() const noexcept;
+    [[nodiscard]] usize liveBytes() const noexcept;
+    [[nodiscard]] usize capacity() const noexcept;
+    [[nodiscard]] usize overflowCount() const noexcept;
+    [[nodiscard]] usize invalidReleaseCount() const noexcept;
     [[nodiscard]] bool doubleFreeDetected() const noexcept;
 
     void clear() noexcept;
@@ -52,16 +51,16 @@ private:
     void recordReleaseHistory(void* address) noexcept;
 
     AllocationRecord* m_records = nullptr;
-    std::size_t m_capacity = 0;
-    std::size_t m_count = 0;
-    std::size_t m_liveBytes = 0;
-    std::size_t m_overflowCount = 0;
-    std::size_t m_invalidReleaseCount = 0;
+    usize m_capacity = 0;
+    usize m_count = 0;
+    usize m_liveBytes = 0;
+    usize m_overflowCount = 0;
+    usize m_invalidReleaseCount = 0;
     bool m_doubleFreeDetected = false;
 
     void* m_releaseHistory[kReleaseHistoryCapacity] = {};
-    std::size_t m_releaseHistoryCount = 0;
-    std::size_t m_releaseHistoryNext = 0;
+    usize m_releaseHistoryCount = 0;
+    usize m_releaseHistoryNext = 0;
 };
 
 }

@@ -4,34 +4,35 @@
 #include <new>
 
 #include "core/memory/allocators/pool_allocator.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
 namespace {
 
-std::size_t normalizeObjectSize(std::size_t objectSize) noexcept
+usize normalizeObjectSize(usize objectSize) noexcept
 {
     return objectSize == 0 ? sizeof(void*) : objectSize;
 }
 
-std::size_t normalizeObjectAlignment(std::size_t objectAlignment) noexcept
+usize normalizeObjectAlignment(usize objectAlignment) noexcept
 {
     const bool valid = isPowerOfTwo(objectAlignment) && objectAlignment >= alignof(void*);
     return valid ? objectAlignment : alignof(void*);
 }
 
-std::size_t computeStride(std::size_t objectSize, std::size_t objectAlignment) noexcept
+usize computeStride(usize objectSize, usize objectAlignment) noexcept
 {
-    const std::size_t payload = objectSize > sizeof(void*) ? objectSize : sizeof(void*);
+    const usize payload = objectSize > sizeof(void*) ? objectSize : sizeof(void*);
     return alignUp(payload, objectAlignment);
 }
 
 }
 
 PoolAllocator::PoolAllocator(
-    std::size_t objectSize,
-    std::size_t objectAlignment,
-    std::size_t capacity,
+    usize objectSize,
+    usize objectAlignment,
+    usize capacity,
     IAllocator* backingAllocator)
     : m_backingAllocator(backingAllocator),
       m_objectSize(normalizeObjectSize(objectSize)),
@@ -40,7 +41,7 @@ PoolAllocator::PoolAllocator(
           normalizeObjectSize(objectSize), normalizeObjectAlignment(objectAlignment))),
       m_capacity(capacity)
 {
-    if (m_capacity != 0 && m_stride > std::numeric_limits<std::size_t>::max() / m_capacity)
+    if (m_capacity != 0 && m_stride > std::numeric_limits<usize>::max() / m_capacity)
     {
         m_capacity = 0;
         m_freeCount = 0;
@@ -60,7 +61,7 @@ PoolAllocator::PoolAllocator(
         return;
     }
 
-    m_memory = static_cast<std::byte*>(memory);
+    m_memory = static_cast<byte*>(memory);
     m_stats.totalMemory = m_stride * m_capacity;
     rebuildFreeList();
 }
@@ -70,7 +71,7 @@ PoolAllocator::~PoolAllocator()
     deallocateBacking(m_memory);
 }
 
-void* PoolAllocator::allocate(std::size_t size, std::size_t alignment) noexcept
+void* PoolAllocator::allocate(usize size, usize alignment) noexcept
 {
     if (size == 0 || size > m_objectSize || !isPowerOfTwo(alignment) ||
         alignment > m_objectAlignment || m_freeList == nullptr)
@@ -109,7 +110,7 @@ void PoolAllocator::deallocate(void* pointer) noexcept
         return;
     }
 
-    const std::size_t offset = static_cast<std::size_t>(address - base);
+    const usize offset = static_cast<usize>(address - base);
 
     if (offset % m_stride != 0 || isFreeBlock(pointer))
     {
@@ -129,12 +130,12 @@ void PoolAllocator::reset() noexcept
     m_stats.usedMemory = 0;
 }
 
-std::size_t PoolAllocator::usedMemory() const noexcept
+usize PoolAllocator::usedMemory() const noexcept
 {
     return m_stats.usedMemory;
 }
 
-std::size_t PoolAllocator::totalMemory() const noexcept
+usize PoolAllocator::totalMemory() const noexcept
 {
     return m_stride * m_capacity;
 }
@@ -154,32 +155,32 @@ AllocatorCapabilities PoolAllocator::capabilities() const noexcept
     return capabilities;
 }
 
-std::size_t PoolAllocator::objectSize() const noexcept
+usize PoolAllocator::objectSize() const noexcept
 {
     return m_objectSize;
 }
 
-std::size_t PoolAllocator::objectAlignment() const noexcept
+usize PoolAllocator::objectAlignment() const noexcept
 {
     return m_objectAlignment;
 }
 
-std::size_t PoolAllocator::stride() const noexcept
+usize PoolAllocator::stride() const noexcept
 {
     return m_stride;
 }
 
-std::size_t PoolAllocator::capacity() const noexcept
+usize PoolAllocator::capacity() const noexcept
 {
     return m_capacity;
 }
 
-std::size_t PoolAllocator::freeCount() const noexcept
+usize PoolAllocator::freeCount() const noexcept
 {
     return m_freeCount;
 }
 
-void* PoolAllocator::allocateBacking(std::size_t size, std::size_t alignment) noexcept
+void* PoolAllocator::allocateBacking(usize size, usize alignment) noexcept
 {
     if (m_backingAllocator != nullptr)
     {
@@ -224,9 +225,9 @@ void PoolAllocator::rebuildFreeList() noexcept
     m_freeList = nullptr;
     m_freeCount = m_capacity;
 
-    for (std::size_t index = m_capacity; index > 0; --index)
+    for (usize index = m_capacity; index > 0; --index)
     {
-        const std::size_t blockIndex = index - 1;
+        const usize blockIndex = index - 1;
         void* block = m_memory + (blockIndex * m_stride);
         *static_cast<void**>(block) = m_freeList;
         m_freeList = block;

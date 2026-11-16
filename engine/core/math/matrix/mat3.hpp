@@ -7,12 +7,13 @@
 #include "core/math/common/constants.hpp"
 #include "core/math/common/math_utils.hpp"
 #include "core/math/vector/vec2.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
 struct Mat3
 {
-    std::array<float, 9> elements{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    std::array<float32, 9> elements{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
     [[nodiscard]] static constexpr Mat3 identity()
     {
@@ -27,10 +28,10 @@ struct Mat3
         return result;
     }
 
-    [[nodiscard]] static inline Mat3 rotation(float radians)
+    [[nodiscard]] static inline Mat3 rotation(float32 radians)
     {
-        const float cosine = std::cos(radians);
-        const float sine = std::sin(radians);
+        const float32 cosine = std::cos(radians);
+        const float32 sine = std::sin(radians);
 
         Mat3 result;
         result.element(0, 0) = cosine;
@@ -48,12 +49,12 @@ struct Mat3
         return result;
     }
 
-    [[nodiscard]] constexpr float element(std::size_t column, std::size_t row) const
+    [[nodiscard]] constexpr float32 element(usize column, usize row) const
     {
         return elements[column * 3 + row];
     }
 
-    constexpr float& element(std::size_t column, std::size_t row)
+    constexpr float32& element(usize column, usize row)
     {
         return elements[column * 3 + row];
     }
@@ -62,13 +63,13 @@ struct Mat3
     {
         Mat3 result;
 
-        for (std::size_t column = 0; column < 3; ++column)
+        for (usize column = 0; column < 3; ++column)
         {
-            for (std::size_t row = 0; row < 3; ++row)
+            for (usize row = 0; row < 3; ++row)
             {
-                float sum = 0.0f;
+                float32 sum = 0.0f;
 
-                for (std::size_t index = 0; index < 3; ++index)
+                for (usize index = 0; index < 3; ++index)
                 {
                     sum += element(index, row) * other.element(column, index);
                 }
@@ -102,9 +103,9 @@ struct Mat3
     {
         Mat3 result;
 
-        for (std::size_t column = 0; column < 3; ++column)
+        for (usize column = 0; column < 3; ++column)
         {
-            for (std::size_t row = 0; row < 3; ++row)
+            for (usize row = 0; row < 3; ++row)
             {
                 result.element(column, row) = element(row, column);
             }
@@ -113,21 +114,21 @@ struct Mat3
         return result;
     }
 
-    [[nodiscard]] constexpr float determinant() const
+    [[nodiscard]] constexpr float32 determinant() const
     {
         return element(0, 0) * element(1, 1) - element(1, 0) * element(0, 1);
     }
 
     [[nodiscard]] inline bool inverse(Mat3& result) const
     {
-        const float determinantValue = determinant();
+        const float32 determinantValue = determinant();
 
         if (absValue(determinantValue) <= constants::kEpsilon)
         {
             return false;
         }
 
-        const float inverseDeterminant = 1.0f / determinantValue;
+        const float32 inverseDeterminant = 1.0f / determinantValue;
 
         Mat3 inverseMatrix;
         inverseMatrix.element(0, 0) = element(1, 1) * inverseDeterminant;
@@ -146,9 +147,9 @@ struct Mat3
 };
 
 [[nodiscard]] inline bool nearlyEqual(const Mat3& first, const Mat3& second,
-                                      float tolerance = constants::kEpsilon)
+                                      float32 tolerance = constants::kEpsilon)
 {
-    for (std::size_t index = 0; index < first.elements.size(); ++index)
+    for (usize index = 0; index < first.elements.size(); ++index)
     {
         if (!nearlyEqual(first.elements[index], second.elements[index], tolerance))
         {

@@ -3,51 +3,47 @@
 #include <cstddef>
 
 #include "core/memory/allocator.hpp"
+#include "core/utilities/memory/non_copyable.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
-using StackMarker = std::size_t;
+using StackMarker = usize;
 
 class StackAllocator final : public IAllocator
 {
 public:
-    explicit StackAllocator(std::size_t capacity);
+    explicit StackAllocator(usize capacity);
     ~StackAllocator() override;
 
-    StackAllocator(const StackAllocator&) = delete;
-    StackAllocator& operator=(const StackAllocator&) = delete;
-
     [[nodiscard]] void* allocate(
-        std::size_t size, std::size_t alignment = kDefaultAlignment) noexcept override;
+        usize size, usize alignment = kDefaultAlignment) noexcept override;
 
     void deallocate(void* pointer) noexcept override;
     void reset() noexcept override;
 
-    [[nodiscard]] std::size_t usedMemory() const noexcept override;
-    [[nodiscard]] std::size_t totalMemory() const noexcept override;
+    [[nodiscard]] usize usedMemory() const noexcept override;
+    [[nodiscard]] usize totalMemory() const noexcept override;
     [[nodiscard]] AllocatorStats stats() const noexcept override;
     [[nodiscard]] AllocatorCapabilities capabilities() const noexcept override;
 
     [[nodiscard]] StackMarker marker() const noexcept;
     void freeToMarker(StackMarker marker) noexcept;
 
-    [[nodiscard]] std::size_t capacity() const noexcept;
+    [[nodiscard]] usize capacity() const noexcept;
 
 private:
     void* m_memory = nullptr;
-    std::size_t m_capacity = 0;
-    std::size_t m_offset = 0;
+    usize m_capacity = 0;
+    usize m_offset = 0;
     AllocatorStats m_stats;
 };
 
-class ScopedStackAllocation
+class ScopedStackAllocation : public NonCopyable
 {
 public:
     explicit ScopedStackAllocation(StackAllocator& allocator) noexcept;
     ~ScopedStackAllocation();
-
-    ScopedStackAllocation(const ScopedStackAllocation&) = delete;
-    ScopedStackAllocation& operator=(const ScopedStackAllocation&) = delete;
 
     ScopedStackAllocation(ScopedStackAllocation&& other) noexcept;
     ScopedStackAllocation& operator=(ScopedStackAllocation&&) = delete;

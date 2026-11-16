@@ -2,6 +2,7 @@
 
 #include "core/math/common/math_utils.hpp"
 #include "core/math/vector/vec2.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
@@ -27,12 +28,12 @@ struct Rect
         return Vec2{maxValue(position.x, opposite.x), maxValue(position.y, opposite.y)};
     }
 
-    [[nodiscard]] constexpr float width() const
+    [[nodiscard]] constexpr float32 width() const
     {
         return absValue(size.x);
     }
 
-    [[nodiscard]] constexpr float height() const
+    [[nodiscard]] constexpr float32 height() const
     {
         return absValue(size.y);
     }
@@ -60,7 +61,7 @@ struct Rect
         return Rect{low, max() - low};
     }
 
-    [[nodiscard]] constexpr Rect expanded(float amount) const
+    [[nodiscard]] constexpr Rect expanded(float32 amount) const
     {
         const Vec2 low = min() - Vec2{amount, amount};
         const Vec2 high = max() + Vec2{amount, amount};

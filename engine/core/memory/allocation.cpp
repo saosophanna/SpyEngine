@@ -4,6 +4,7 @@
 #include <new>
 
 #include "core/memory/allocation.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
@@ -12,12 +13,12 @@ namespace {
 struct BlockHeader
 {
     void* base = nullptr;
-    std::size_t size = 0;
+    usize size = 0;
 };
 
 }
 
-bool isAligned(const void* pointer, std::size_t alignment) noexcept
+bool isAligned(const void* pointer, usize alignment) noexcept
 {
     if (!isPowerOfTwo(alignment))
     {
@@ -27,22 +28,22 @@ bool isAligned(const void* pointer, std::size_t alignment) noexcept
     return reinterpret_cast<std::uintptr_t>(pointer) % alignment == 0;
 }
 
-void* allocateSystem(std::size_t size, std::size_t alignment) noexcept
+void* allocateSystem(usize size, usize alignment) noexcept
 {
     if (size == 0 || !isPowerOfTwo(alignment))
     {
         return nullptr;
     }
 
-    const std::size_t effectiveAlignment =
+    const usize effectiveAlignment =
         alignment < alignof(BlockHeader) ? alignof(BlockHeader) : alignment;
 
-    if (size > std::numeric_limits<std::size_t>::max() - effectiveAlignment - sizeof(BlockHeader))
+    if (size > std::numeric_limits<usize>::max() - effectiveAlignment - sizeof(BlockHeader))
     {
         return nullptr;
     }
 
-    const std::size_t total = size + effectiveAlignment + sizeof(BlockHeader);
+    const usize total = size + effectiveAlignment + sizeof(BlockHeader);
     void* base = ::operator new(total, std::nothrow);
 
     if (base == nullptr)

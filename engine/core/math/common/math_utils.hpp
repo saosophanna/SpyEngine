@@ -4,54 +4,55 @@
 #include <cstdint>
 
 #include "core/math/common/constants.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
-[[nodiscard]] constexpr float clamp(float value, float low, float high)
+[[nodiscard]] constexpr float32 clamp(float32 value, float32 low, float32 high)
 {
     return value < low ? low : (value > high ? high : value);
 }
 
-[[nodiscard]] constexpr float minValue(float first, float second)
+[[nodiscard]] constexpr float32 minValue(float32 first, float32 second)
 {
     return first < second ? first : second;
 }
 
-[[nodiscard]] constexpr float maxValue(float first, float second)
+[[nodiscard]] constexpr float32 maxValue(float32 first, float32 second)
 {
     return first > second ? first : second;
 }
 
-[[nodiscard]] constexpr float absValue(float value)
+[[nodiscard]] constexpr float32 absValue(float32 value)
 {
     return value < 0.0f ? -value : value;
 }
 
-[[nodiscard]] constexpr float sign(float value)
+[[nodiscard]] constexpr float32 sign(float32 value)
 {
     return value > 0.0f ? 1.0f : (value < 0.0f ? -1.0f : 0.0f);
 }
 
-[[nodiscard]] constexpr float saturate(float value)
+[[nodiscard]] constexpr float32 saturate(float32 value)
 {
     return clamp(value, 0.0f, 1.0f);
 }
 
-[[nodiscard]] constexpr float square(float value)
+[[nodiscard]] constexpr float32 square(float32 value)
 {
     return value * value;
 }
 
-[[nodiscard]] inline float wrap(float value, float low, float high)
+[[nodiscard]] inline float32 wrap(float32 value, float32 low, float32 high)
 {
-    const float range = high - low;
+    const float32 range = high - low;
 
     if (range <= 0.0f)
     {
         return low;
     }
 
-    float result = std::fmod(value - low, range);
+    float32 result = std::fmod(value - low, range);
 
     if (result < 0.0f)
     {
@@ -61,42 +62,42 @@ namespace spy::math {
     return low + result;
 }
 
-[[nodiscard]] inline bool nearlyEqual(float first, float second,
-                                      float absoluteTolerance = constants::kEpsilon,
-                                      float relativeTolerance = constants::kEpsilon)
+[[nodiscard]] inline bool nearlyEqual(float32 first, float32 second,
+                                      float32 absoluteTolerance = constants::kEpsilon,
+                                      float32 relativeTolerance = constants::kEpsilon)
 {
     if (first == second)
     {
         return true;
     }
 
-    const float difference = std::fabs(first - second);
+    const float32 difference = std::fabs(first - second);
 
     if (difference <= absoluteTolerance)
     {
         return true;
     }
 
-    const float magnitude = std::fmax(std::fabs(first), std::fabs(second));
+    const float32 magnitude = std::fmax(std::fabs(first), std::fabs(second));
     return difference <= relativeTolerance * magnitude;
 }
 
-[[nodiscard]] constexpr float degreesToRadians(float degrees)
+[[nodiscard]] constexpr float32 degreesToRadians(float32 degrees)
 {
     return degrees * constants::kDegToRad;
 }
 
-[[nodiscard]] constexpr float radiansToDegrees(float radians)
+[[nodiscard]] constexpr float32 radiansToDegrees(float32 radians)
 {
     return radians * constants::kRadToDeg;
 }
 
-[[nodiscard]] constexpr bool isPowerOfTwo(std::uint32_t value)
+[[nodiscard]] constexpr bool isPowerOfTwo(uint32 value)
 {
     return value != 0 && (value & (value - 1)) == 0;
 }
 
-[[nodiscard]] constexpr std::uint32_t nextPowerOfTwo(std::uint32_t value)
+[[nodiscard]] constexpr uint32 nextPowerOfTwo(uint32 value)
 {
     if (value <= 1)
     {

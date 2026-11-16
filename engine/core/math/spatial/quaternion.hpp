@@ -8,18 +8,19 @@
 #include "core/math/matrix/mat3.hpp"
 #include "core/math/matrix/mat4.hpp"
 #include "core/math/vector/vec3.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
 struct Quaternion
 {
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    float w = 1.0f;
+    float32 x = 0.0f;
+    float32 y = 0.0f;
+    float32 z = 0.0f;
+    float32 w = 1.0f;
 
     constexpr Quaternion() = default;
-    constexpr Quaternion(float xValue, float yValue, float zValue, float wValue)
+    constexpr Quaternion(float32 xValue, float32 yValue, float32 zValue, float32 wValue)
         : x(xValue), y(yValue), z(zValue), w(wValue)
     {
     }
@@ -29,7 +30,7 @@ struct Quaternion
         return Quaternion{};
     }
 
-    [[nodiscard]] static inline Quaternion fromAxisAngle(const Vec3& axis, float radians)
+    [[nodiscard]] static inline Quaternion fromAxisAngle(const Vec3& axis, float32 radians)
     {
         const Vec3 normalizedAxis = axis.normalized();
 
@@ -38,8 +39,8 @@ struct Quaternion
             return identity();
         }
 
-        const float halfAngle = radians * 0.5f;
-        const float sine = std::sin(halfAngle);
+        const float32 halfAngle = radians * 0.5f;
+        const float32 sine = std::sin(halfAngle);
         return Quaternion{normalizedAxis.x * sine, normalizedAxis.y * sine,
                           normalizedAxis.z * sine, std::cos(halfAngle)};
     }
@@ -64,7 +65,7 @@ struct Quaternion
         return Quaternion{x - other.x, y - other.y, z - other.z, w - other.w};
     }
 
-    [[nodiscard]] constexpr Quaternion operator*(float scalar) const
+    [[nodiscard]] constexpr Quaternion operator*(float32 scalar) const
     {
         return Quaternion{x * scalar, y * scalar, z * scalar, w * scalar};
     }
@@ -87,40 +88,40 @@ struct Quaternion
         return !(*this == other);
     }
 
-    [[nodiscard]] constexpr float lengthSquared() const
+    [[nodiscard]] constexpr float32 lengthSquared() const
     {
         return x * x + y * y + z * z + w * w;
     }
 
-    [[nodiscard]] inline float length() const
+    [[nodiscard]] inline float32 length() const
     {
         return std::sqrt(lengthSquared());
     }
 
     [[nodiscard]] inline Quaternion normalized() const
     {
-        const float squared = lengthSquared();
+        const float32 squared = lengthSquared();
 
         if (squared <= constants::kEpsilon * constants::kEpsilon)
         {
             return identity();
         }
 
-        const float inverseLength = 1.0f / std::sqrt(squared);
+        const float32 inverseLength = 1.0f / std::sqrt(squared);
         return Quaternion{x * inverseLength, y * inverseLength, z * inverseLength,
                           w * inverseLength};
     }
 
     inline bool normalize()
     {
-        const float squared = lengthSquared();
+        const float32 squared = lengthSquared();
 
         if (squared <= constants::kEpsilon * constants::kEpsilon)
         {
             return false;
         }
 
-        const float inverseLength = 1.0f / std::sqrt(squared);
+        const float32 inverseLength = 1.0f / std::sqrt(squared);
         x *= inverseLength;
         y *= inverseLength;
         z *= inverseLength;
@@ -135,19 +136,19 @@ struct Quaternion
 
     [[nodiscard]] inline Quaternion inverse() const
     {
-        const float squared = lengthSquared();
+        const float32 squared = lengthSquared();
 
         if (squared <= constants::kEpsilon * constants::kEpsilon)
         {
             return identity();
         }
 
-        const float inverseLength = 1.0f / squared;
+        const float32 inverseLength = 1.0f / squared;
         return Quaternion{-x * inverseLength, -y * inverseLength, -z * inverseLength,
                           w * inverseLength};
     }
 
-    [[nodiscard]] constexpr float dot(const Quaternion& other) const
+    [[nodiscard]] constexpr float32 dot(const Quaternion& other) const
     {
         return x * other.x + y * other.y + z * other.z + w * other.w;
     }
@@ -161,15 +162,15 @@ struct Quaternion
 
     [[nodiscard]] inline Mat3 toMat3() const
     {
-        const float xx = x * x;
-        const float yy = y * y;
-        const float zz = z * z;
-        const float xy = x * y;
-        const float xz = x * z;
-        const float yz = y * z;
-        const float wx = w * x;
-        const float wy = w * y;
-        const float wz = w * z;
+        const float32 xx = x * x;
+        const float32 yy = y * y;
+        const float32 zz = z * z;
+        const float32 xy = x * y;
+        const float32 xz = x * z;
+        const float32 yz = y * z;
+        const float32 wx = w * x;
+        const float32 wy = w * y;
+        const float32 wz = w * z;
 
         Mat3 result;
         result.element(0, 0) = 1.0f - 2.0f * (yy + zz);
@@ -190,9 +191,9 @@ struct Quaternion
 
         Mat4 result;
 
-        for (std::size_t column = 0; column < 3; ++column)
+        for (usize column = 0; column < 3; ++column)
         {
-            for (std::size_t row = 0; row < 3; ++row)
+            for (usize row = 0; row < 3; ++row)
             {
                 result.element(column, row) = rotationMatrix.element(column, row);
             }
@@ -202,9 +203,10 @@ struct Quaternion
     }
 };
 
-[[nodiscard]] inline Quaternion slerp(const Quaternion& start, const Quaternion& end, float amount)
+[[nodiscard]] inline Quaternion slerp(const Quaternion& start, const Quaternion& end,
+                                      float32 amount)
 {
-    float cosine = start.dot(end);
+    float32 cosine = start.dot(end);
     Quaternion adjustedEnd = end;
 
     if (cosine < 0.0f)
@@ -222,10 +224,10 @@ struct Quaternion
             .normalized();
     }
 
-    const float angle = std::acos(clamp(cosine, -1.0f, 1.0f));
-    const float sine = std::sin(angle);
-    const float startScale = std::sin((1.0f - amount) * angle) / sine;
-    const float endScale = std::sin(amount * angle) / sine;
+    const float32 angle = std::acos(clamp(cosine, -1.0f, 1.0f));
+    const float32 sine = std::sin(angle);
+    const float32 startScale = std::sin((1.0f - amount) * angle) / sine;
+    const float32 endScale = std::sin(amount * angle) / sine;
 
     return Quaternion{start.x * startScale + adjustedEnd.x * endScale,
                       start.y * startScale + adjustedEnd.y * endScale,
@@ -234,7 +236,7 @@ struct Quaternion
 }
 
 [[nodiscard]] inline bool nearlyEqual(const Quaternion& first, const Quaternion& second,
-                                      float tolerance = constants::kEpsilon)
+                                      float32 tolerance = constants::kEpsilon)
 {
     return nearlyEqual(first.x, second.x, tolerance) && nearlyEqual(first.y, second.y, tolerance) &&
            nearlyEqual(first.z, second.z, tolerance) && nearlyEqual(first.w, second.w, tolerance);

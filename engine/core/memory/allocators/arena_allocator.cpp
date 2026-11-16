@@ -4,10 +4,11 @@
 #include <new>
 
 #include "core/memory/allocators/arena_allocator.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
-ArenaAllocator::ArenaAllocator(std::size_t blockSize, IAllocator* backingAllocator)
+ArenaAllocator::ArenaAllocator(usize blockSize, IAllocator* backingAllocator)
     : m_backingAllocator(backingAllocator),
       m_blockSize(blockSize == 0 ? kDefaultBlockSize : blockSize)
 {
@@ -18,7 +19,7 @@ ArenaAllocator::~ArenaAllocator()
     release();
 }
 
-void* ArenaAllocator::allocate(std::size_t size, std::size_t alignment) noexcept
+void* ArenaAllocator::allocate(usize size, usize alignment) noexcept
 {
     if (size == 0 || !isPowerOfTwo(alignment))
     {
@@ -28,10 +29,10 @@ void* ArenaAllocator::allocate(std::size_t size, std::size_t alignment) noexcept
 
     if (m_current != nullptr)
     {
-        std::byte* current = m_current->current;
-        const std::size_t padding =
+        byte* current = m_current->current;
+        const usize padding =
             alignmentPadding(reinterpret_cast<std::uintptr_t>(current), alignment);
-        const std::size_t available = static_cast<std::size_t>(m_current->end - current);
+        const usize available = static_cast<usize>(m_current->end - current);
 
         if (padding <= available && size <= available - padding)
         {
@@ -41,7 +42,7 @@ void* ArenaAllocator::allocate(std::size_t size, std::size_t alignment) noexcept
         }
     }
 
-    if (size > std::numeric_limits<std::size_t>::max() - alignment)
+    if (size > std::numeric_limits<usize>::max() - alignment)
     {
         ++m_stats.failedAllocationCount;
         return nullptr;
@@ -55,8 +56,8 @@ void* ArenaAllocator::allocate(std::size_t size, std::size_t alignment) noexcept
         return nullptr;
     }
 
-    std::byte* current = block->current;
-    const std::size_t padding =
+    byte* current = block->current;
+    const usize padding =
         alignmentPadding(reinterpret_cast<std::uintptr_t>(current), alignment);
 
     block->current = current + padding + size;
@@ -80,12 +81,12 @@ void ArenaAllocator::reset() noexcept
     m_stats.usedMemory = 0;
 }
 
-std::size_t ArenaAllocator::usedMemory() const noexcept
+usize ArenaAllocator::usedMemory() const noexcept
 {
     return m_stats.usedMemory;
 }
 
-std::size_t ArenaAllocator::totalMemory() const noexcept
+usize ArenaAllocator::totalMemory() const noexcept
 {
     return m_stats.totalMemory;
 }
@@ -105,12 +106,12 @@ AllocatorCapabilities ArenaAllocator::capabilities() const noexcept
     return capabilities;
 }
 
-std::size_t ArenaAllocator::blockSize() const noexcept
+usize ArenaAllocator::blockSize() const noexcept
 {
     return m_blockSize;
 }
 
-std::size_t ArenaAllocator::blockCount() const noexcept
+usize ArenaAllocator::blockCount() const noexcept
 {
     return m_blockCount;
 }
@@ -133,7 +134,7 @@ void ArenaAllocator::release() noexcept
     m_stats.usedMemory = 0;
 }
 
-void* ArenaAllocator::allocateBacking(std::size_t size, std::size_t alignment) noexcept
+void* ArenaAllocator::allocateBacking(usize size, usize alignment) noexcept
 {
     if (m_backingAllocator != nullptr)
     {
@@ -159,11 +160,11 @@ void ArenaAllocator::deallocateBacking(void* pointer) noexcept
     deallocateSystem(pointer);
 }
 
-ArenaAllocator::Block* ArenaAllocator::createBlock(std::size_t payloadSize) noexcept
+ArenaAllocator::Block* ArenaAllocator::createBlock(usize payloadSize) noexcept
 {
-    const std::size_t capacity = payloadSize > m_blockSize ? payloadSize : m_blockSize;
+    const usize capacity = payloadSize > m_blockSize ? payloadSize : m_blockSize;
 
-    if (capacity > std::numeric_limits<std::size_t>::max() - sizeof(Block))
+    if (capacity > std::numeric_limits<usize>::max() - sizeof(Block))
     {
         return nullptr;
     }
@@ -177,7 +178,7 @@ ArenaAllocator::Block* ArenaAllocator::createBlock(std::size_t payloadSize) noex
 
     auto* block = ::new (memory) Block{};
     block->next = m_blocks;
-    block->begin = reinterpret_cast<std::byte*>(memory) + sizeof(Block);
+    block->begin = reinterpret_cast<byte*>(memory) + sizeof(Block);
     block->current = block->begin;
     block->end = block->begin + capacity;
 
@@ -189,7 +190,7 @@ ArenaAllocator::Block* ArenaAllocator::createBlock(std::size_t payloadSize) noex
     return block;
 }
 
-void ArenaAllocator::recordAllocation(std::size_t bytes) noexcept
+void ArenaAllocator::recordAllocation(usize bytes) noexcept
 {
     ++m_stats.allocationCount;
     m_stats.usedMemory += bytes;

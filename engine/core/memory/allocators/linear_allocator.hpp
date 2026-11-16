@@ -3,40 +3,38 @@
 #include <cstddef>
 
 #include "core/memory/allocator.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
 class LinearAllocator final : public IAllocator
 {
 public:
-    explicit LinearAllocator(std::size_t capacity);
-    LinearAllocator(void* buffer, std::size_t capacity) noexcept;
+    explicit LinearAllocator(usize capacity);
+    LinearAllocator(void* buffer, usize capacity) noexcept;
     ~LinearAllocator() override;
 
-    LinearAllocator(const LinearAllocator&) = delete;
-    LinearAllocator& operator=(const LinearAllocator&) = delete;
-
     [[nodiscard]] void* allocate(
-        std::size_t size, std::size_t alignment = kDefaultAlignment) noexcept override;
+        usize size, usize alignment = kDefaultAlignment) noexcept override;
 
     void deallocate(void* pointer) noexcept override;
     void reset() noexcept override;
 
-    [[nodiscard]] std::size_t usedMemory() const noexcept override;
-    [[nodiscard]] std::size_t totalMemory() const noexcept override;
+    [[nodiscard]] usize usedMemory() const noexcept override;
+    [[nodiscard]] usize totalMemory() const noexcept override;
     [[nodiscard]] AllocatorStats stats() const noexcept override;
     [[nodiscard]] AllocatorCapabilities capabilities() const noexcept override;
 
-    [[nodiscard]] std::size_t capacity() const noexcept;
-    [[nodiscard]] std::size_t offset() const noexcept;
+    [[nodiscard]] usize capacity() const noexcept;
+    [[nodiscard]] usize offset() const noexcept;
 
     [[nodiscard]] void* data() noexcept;
     [[nodiscard]] const void* data() const noexcept;
 
 private:
     void* m_memory = nullptr;
-    std::size_t m_capacity = 0;
-    std::size_t m_offset = 0;
+    usize m_capacity = 0;
+    usize m_offset = 0;
     bool m_owned = false;
     AllocatorStats m_stats;
 };

@@ -1,6 +1,7 @@
 #include <cstdint>
 
 #include "core/memory/manager/memory_manager.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
@@ -17,10 +18,9 @@ void MemoryManager::shutdown() noexcept
     m_initialized = false;
 }
 
-bool MemoryManager::registerAllocator(std::uint32_t id, IAllocator& allocator) noexcept
+bool MemoryManager::registerAllocator(AllocatorId id, IAllocator& allocator) noexcept
 {
-    if (!m_initialized || m_count >= static_cast<std::uint32_t>(kMaxAllocators) ||
-        find(id) != nullptr)
+    if (!m_initialized || !id.isValid() || m_count >= kMaxAllocators || find(id) != nullptr)
     {
         return false;
     }
@@ -31,7 +31,7 @@ bool MemoryManager::registerAllocator(std::uint32_t id, IAllocator& allocator) n
     return true;
 }
 
-bool MemoryManager::unregisterAllocator(std::uint32_t id) noexcept
+bool MemoryManager::unregisterAllocator(AllocatorId id) noexcept
 {
     Entry* entry = find(id);
 
@@ -46,15 +46,15 @@ bool MemoryManager::unregisterAllocator(std::uint32_t id) noexcept
     return true;
 }
 
-IAllocator* MemoryManager::allocator(std::uint32_t id) noexcept
+IAllocator* MemoryManager::allocator(AllocatorId id) noexcept
 {
     Entry* entry = find(id);
     return entry != nullptr ? entry->allocator : nullptr;
 }
 
-const IAllocator* MemoryManager::allocator(std::uint32_t id) const noexcept
+const IAllocator* MemoryManager::allocator(AllocatorId id) const noexcept
 {
-    for (std::uint32_t index = 0; index < m_count; ++index)
+    for (usize index = 0; index < m_count; ++index)
     {
         if (m_entries[index].id == id)
         {
@@ -65,16 +65,16 @@ const IAllocator* MemoryManager::allocator(std::uint32_t id) const noexcept
     return nullptr;
 }
 
-std::uint32_t MemoryManager::allocatorCount() const noexcept
+uint32 MemoryManager::allocatorCount() const noexcept
 {
-    return m_count;
+    return static_cast<uint32>(m_count);
 }
 
 MemoryStats MemoryManager::stats() const noexcept
 {
     MemoryStats result;
 
-    for (std::uint32_t index = 0; index < m_count; ++index)
+    for (usize index = 0; index < m_count; ++index)
     {
         const AllocatorStats allocatorStats = m_entries[index].allocator->stats();
 
@@ -86,22 +86,22 @@ MemoryStats MemoryManager::stats() const noexcept
         result.failedAllocationCount += allocatorStats.failedAllocationCount;
     }
 
-    result.allocatorCount = m_count;
+    result.allocatorCount = static_cast<uint32>(m_count);
 
     return result;
 }
 
 void MemoryManager::resetAllocators() noexcept
 {
-    for (std::uint32_t index = 0; index < m_count; ++index)
+    for (usize index = 0; index < m_count; ++index)
     {
         m_entries[index].allocator->reset();
     }
 }
 
-MemoryManager::Entry* MemoryManager::find(std::uint32_t id) noexcept
+MemoryManager::Entry* MemoryManager::find(AllocatorId id) noexcept
 {
-    for (std::uint32_t index = 0; index < m_count; ++index)
+    for (usize index = 0; index < m_count; ++index)
     {
         if (m_entries[index].id == id)
         {

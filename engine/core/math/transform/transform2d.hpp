@@ -6,13 +6,14 @@
 #include "core/math/common/math_utils.hpp"
 #include "core/math/matrix/mat3.hpp"
 #include "core/math/vector/vec2.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
 struct Transform2D
 {
     Vec2 position{};
-    float rotation = 0.0f;
+    float32 rotation = 0.0f;
     Vec2 scale{1.0f, 1.0f};
 
     [[nodiscard]] inline Mat3 matrix() const

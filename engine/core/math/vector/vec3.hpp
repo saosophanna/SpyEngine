@@ -5,18 +5,20 @@
 #include "core/math/common/constants.hpp"
 #include "core/math/common/math_utils.hpp"
 #include "core/math/vector/vec2.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
 struct Vec3
 {
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
+    float32 x = 0.0f;
+    float32 y = 0.0f;
+    float32 z = 0.0f;
 
     constexpr Vec3() = default;
-    constexpr Vec3(float xValue, float yValue, float zValue) : x(xValue), y(yValue), z(zValue) {}
-    constexpr Vec3(const Vec2& xy, float zValue) : x(xy.x), y(xy.y), z(zValue) {}
+    constexpr Vec3(
+        float32 xValue, float32 yValue, float32 zValue) : x(xValue), y(yValue), z(zValue) {}
+    constexpr Vec3(const Vec2& xy, float32 zValue) : x(xy.x), y(xy.y), z(zValue) {}
 
     [[nodiscard]] static constexpr Vec3 zero()
     {
@@ -63,12 +65,12 @@ struct Vec3
         return Vec3{-x, -y, -z};
     }
 
-    [[nodiscard]] constexpr Vec3 operator*(float scalar) const
+    [[nodiscard]] constexpr Vec3 operator*(float32 scalar) const
     {
         return Vec3{x * scalar, y * scalar, z * scalar};
     }
 
-    [[nodiscard]] constexpr Vec3 operator/(float scalar) const
+    [[nodiscard]] constexpr Vec3 operator/(float32 scalar) const
     {
         return Vec3{x / scalar, y / scalar, z / scalar};
     }
@@ -89,7 +91,7 @@ struct Vec3
         return *this;
     }
 
-    constexpr Vec3& operator*=(float scalar)
+    constexpr Vec3& operator*=(float32 scalar)
     {
         x *= scalar;
         y *= scalar;
@@ -97,7 +99,7 @@ struct Vec3
         return *this;
     }
 
-    constexpr Vec3& operator/=(float scalar)
+    constexpr Vec3& operator/=(float32 scalar)
     {
         x /= scalar;
         y /= scalar;
@@ -115,46 +117,46 @@ struct Vec3
         return !(*this == other);
     }
 
-    [[nodiscard]] constexpr float lengthSquared() const
+    [[nodiscard]] constexpr float32 lengthSquared() const
     {
         return x * x + y * y + z * z;
     }
 
-    [[nodiscard]] inline float length() const
+    [[nodiscard]] inline float32 length() const
     {
         return std::sqrt(lengthSquared());
     }
 
     [[nodiscard]] inline Vec3 normalized() const
     {
-        const float squared = lengthSquared();
+        const float32 squared = lengthSquared();
 
         if (squared <= constants::kEpsilon * constants::kEpsilon)
         {
             return zero();
         }
 
-        const float inverseLength = 1.0f / std::sqrt(squared);
+        const float32 inverseLength = 1.0f / std::sqrt(squared);
         return Vec3{x * inverseLength, y * inverseLength, z * inverseLength};
     }
 
     inline bool normalize()
     {
-        const float squared = lengthSquared();
+        const float32 squared = lengthSquared();
 
         if (squared <= constants::kEpsilon * constants::kEpsilon)
         {
             return false;
         }
 
-        const float inverseLength = 1.0f / std::sqrt(squared);
+        const float32 inverseLength = 1.0f / std::sqrt(squared);
         x *= inverseLength;
         y *= inverseLength;
         z *= inverseLength;
         return true;
     }
 
-    [[nodiscard]] constexpr float dot(const Vec3& other) const
+    [[nodiscard]] constexpr float32 dot(const Vec3& other) const
     {
         return x * other.x + y * other.y + z * other.z;
     }
@@ -165,29 +167,29 @@ struct Vec3
                      x * other.y - y * other.x};
     }
 
-    [[nodiscard]] inline float distance(const Vec3& other) const
+    [[nodiscard]] inline float32 distance(const Vec3& other) const
     {
         return (*this - other).length();
     }
 
-    [[nodiscard]] static inline float distance(const Vec3& first, const Vec3& second)
+    [[nodiscard]] static inline float32 distance(const Vec3& first, const Vec3& second)
     {
         return (first - second).length();
     }
 
-    [[nodiscard]] constexpr float distanceSquared(const Vec3& other) const
+    [[nodiscard]] constexpr float32 distanceSquared(const Vec3& other) const
     {
         return (*this - other).lengthSquared();
     }
 };
 
-[[nodiscard]] constexpr Vec3 operator*(float scalar, const Vec3& vector)
+[[nodiscard]] constexpr Vec3 operator*(float32 scalar, const Vec3& vector)
 {
     return vector * scalar;
 }
 
 [[nodiscard]] inline bool nearlyEqual(const Vec3& first, const Vec3& second,
-                                      float tolerance = constants::kEpsilon)
+                                      float32 tolerance = constants::kEpsilon)
 {
     return nearlyEqual(first.x, second.x, tolerance) && nearlyEqual(first.y, second.y, tolerance) &&
            nearlyEqual(first.z, second.z, tolerance);
@@ -195,7 +197,7 @@ struct Vec3
 
 [[nodiscard]] constexpr Vec3 project(const Vec3& vector, const Vec3& onto)
 {
-    const float lengthSquared = onto.lengthSquared();
+    const float32 lengthSquared = onto.lengthSquared();
 
     if (lengthSquared <= constants::kEpsilon * constants::kEpsilon)
     {

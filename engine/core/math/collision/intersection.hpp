@@ -11,6 +11,7 @@
 #include "core/math/geometry/closest_point.hpp"
 #include "core/math/geometry/ray.hpp"
 #include "core/math/geometry/rect.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
@@ -21,7 +22,7 @@ namespace spy::math {
 
 [[nodiscard]] inline bool circleIntersectsCircle(const Circle& first, const Circle& second)
 {
-    const float radiusSum = first.radius + second.radius;
+    const float32 radiusSum = first.radius + second.radius;
     return first.center.distanceSquared(second.center) <= radiusSum * radiusSum;
 }
 
@@ -36,17 +37,17 @@ namespace spy::math {
     return first.overlaps(second);
 }
 
-[[nodiscard]] inline bool rayIntersectsAabb(const Ray& ray, const Aabb& box, float& distance)
+[[nodiscard]] inline bool rayIntersectsAabb(const Ray& ray, const Aabb& box, float32& distance)
 {
-    const float origins[3] = {ray.origin.x, ray.origin.y, ray.origin.z};
-    const float directions[3] = {ray.direction.x, ray.direction.y, ray.direction.z};
-    const float lows[3] = {box.min.x, box.min.y, box.min.z};
-    const float highs[3] = {box.max.x, box.max.y, box.max.z};
+    const float32 origins[3] = {ray.origin.x, ray.origin.y, ray.origin.z};
+    const float32 directions[3] = {ray.direction.x, ray.direction.y, ray.direction.z};
+    const float32 lows[3] = {box.min.x, box.min.y, box.min.z};
+    const float32 highs[3] = {box.max.x, box.max.y, box.max.z};
 
-    float entry = 0.0f;
-    float exit = std::numeric_limits<float>::max();
+    float32 entry = 0.0f;
+    float32 exit = std::numeric_limits<float32>::max();
 
-    for (std::size_t axis = 0; axis < 3; ++axis)
+    for (usize axis = 0; axis < 3; ++axis)
     {
         if (absValue(directions[axis]) <= constants::kEpsilon)
         {
@@ -58,12 +59,12 @@ namespace spy::math {
             continue;
         }
 
-        float nearDistance = (lows[axis] - origins[axis]) / directions[axis];
-        float farDistance = (highs[axis] - origins[axis]) / directions[axis];
+        float32 nearDistance = (lows[axis] - origins[axis]) / directions[axis];
+        float32 farDistance = (highs[axis] - origins[axis]) / directions[axis];
 
         if (nearDistance > farDistance)
         {
-            const float temporary = nearDistance;
+            const float32 temporary = nearDistance;
             nearDistance = farDistance;
             farDistance = temporary;
         }
@@ -82,10 +83,10 @@ namespace spy::math {
 }
 
 [[nodiscard]] inline bool rayIntersectsCircle(const Ray2D& ray, const Circle& circle,
-                                              float& distance)
+                                              float32& distance)
 {
     const Vec2 offset = ray.origin - circle.center;
-    const float quadratic = ray.direction.lengthSquared();
+    const float32 quadratic = ray.direction.lengthSquared();
 
     if (quadratic <= constants::kEpsilon * constants::kEpsilon)
     {
@@ -98,17 +99,17 @@ namespace spy::math {
         return false;
     }
 
-    const float linear = 2.0f * offset.dot(ray.direction);
-    const float constant = offset.lengthSquared() - circle.radius * circle.radius;
-    const float discriminant = linear * linear - 4.0f * quadratic * constant;
+    const float32 linear = 2.0f * offset.dot(ray.direction);
+    const float32 constant = offset.lengthSquared() - circle.radius * circle.radius;
+    const float32 discriminant = linear * linear - 4.0f * quadratic * constant;
 
     if (discriminant < 0.0f)
     {
         return false;
     }
 
-    const float root = std::sqrt(discriminant);
-    const float nearest = (-linear - root) / (2.0f * quadratic);
+    const float32 root = std::sqrt(discriminant);
+    const float32 nearest = (-linear - root) / (2.0f * quadratic);
 
     if (nearest >= 0.0f)
     {
@@ -116,7 +117,7 @@ namespace spy::math {
         return true;
     }
 
-    const float furthest = (-linear + root) / (2.0f * quadratic);
+    const float32 furthest = (-linear + root) / (2.0f * quadratic);
 
     if (furthest >= 0.0f)
     {
@@ -129,11 +130,11 @@ namespace spy::math {
 
 [[nodiscard]] inline bool segmentIntersectsSegment(const Vec2& firstStart, const Vec2& firstEnd,
                                                    const Vec2& secondStart, const Vec2& secondEnd,
-                                                   float& parameter)
+                                                   float32& parameter)
 {
     const Vec2 firstDirection = firstEnd - firstStart;
     const Vec2 secondDirection = secondEnd - secondStart;
-    const float denominator = firstDirection.cross(secondDirection);
+    const float32 denominator = firstDirection.cross(secondDirection);
 
     if (absValue(denominator) <= constants::kEpsilon)
     {
@@ -141,8 +142,8 @@ namespace spy::math {
     }
 
     const Vec2 difference = secondStart - firstStart;
-    const float firstParameter = difference.cross(secondDirection) / denominator;
-    const float secondParameter = difference.cross(firstDirection) / denominator;
+    const float32 firstParameter = difference.cross(secondDirection) / denominator;
+    const float32 secondParameter = difference.cross(firstDirection) / denominator;
 
     if (firstParameter < 0.0f || firstParameter > 1.0f || secondParameter < 0.0f ||
         secondParameter > 1.0f)

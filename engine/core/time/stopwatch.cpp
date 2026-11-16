@@ -2,6 +2,7 @@
 #include <cstdint>
 
 #include "core/time/stopwatch.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::time {
 
@@ -35,22 +36,22 @@ bool Stopwatch::isRunning() const noexcept
     return m_running;
 }
 
-double Stopwatch::elapsedSeconds() const
+float64 Stopwatch::elapsedSeconds() const
 {
-    return std::chrono::duration<double>(measurementEnd() - m_start).count();
+    return std::chrono::duration<float64>(measurementEnd() - m_start).count();
 }
 
-double Stopwatch::elapsedMilliseconds() const
+float64 Stopwatch::elapsedMilliseconds() const
 {
-    return std::chrono::duration<double, std::milli>(measurementEnd() - m_start).count();
+    return std::chrono::duration<float64, std::milli>(measurementEnd() - m_start).count();
 }
 
-std::uint64_t Stopwatch::elapsedNanoseconds() const
+uint64 Stopwatch::elapsedNanoseconds() const
 {
     const auto elapsed =
         std::chrono::duration_cast<std::chrono::nanoseconds>(measurementEnd() - m_start).count();
 
-    return elapsed > 0 ? static_cast<std::uint64_t>(elapsed) : 0;
+    return elapsed > 0 ? static_cast<uint64>(elapsed) : 0;
 }
 
 Clock::TimePoint Stopwatch::measurementEnd() const noexcept

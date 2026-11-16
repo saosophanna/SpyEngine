@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "core/time/clock.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::time {
 
@@ -17,9 +18,9 @@ public:
 
     [[nodiscard]] bool isRunning() const noexcept;
 
-    [[nodiscard]] double elapsedSeconds() const;
-    [[nodiscard]] double elapsedMilliseconds() const;
-    [[nodiscard]] std::uint64_t elapsedNanoseconds() const;
+    [[nodiscard]] float64 elapsedSeconds() const;
+    [[nodiscard]] float64 elapsedMilliseconds() const;
+    [[nodiscard]] uint64 elapsedNanoseconds() const;
 
 private:
     [[nodiscard]] Clock::TimePoint measurementEnd() const noexcept;

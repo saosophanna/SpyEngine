@@ -2,10 +2,11 @@
 #include <cstdint>
 
 #include "core/memory/allocators/stack_allocator.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
-StackAllocator::StackAllocator(std::size_t capacity)
+StackAllocator::StackAllocator(usize capacity)
 {
     if (capacity == 0)
     {
@@ -22,7 +23,7 @@ StackAllocator::~StackAllocator()
     deallocateSystem(m_memory);
 }
 
-void* StackAllocator::allocate(std::size_t size, std::size_t alignment) noexcept
+void* StackAllocator::allocate(usize size, usize alignment) noexcept
 {
     if (size == 0 || m_memory == nullptr || !isPowerOfTwo(alignment))
     {
@@ -31,7 +32,7 @@ void* StackAllocator::allocate(std::size_t size, std::size_t alignment) noexcept
     }
 
     const std::uintptr_t address = reinterpret_cast<std::uintptr_t>(m_memory) + m_offset;
-    const std::size_t padding = alignmentPadding(address, alignment);
+    const usize padding = alignmentPadding(address, alignment);
 
     if (padding > m_capacity - m_offset || size > m_capacity - m_offset - padding)
     {
@@ -66,7 +67,7 @@ void StackAllocator::deallocate(void* pointer) noexcept
         return;
     }
 
-    const std::size_t offset = static_cast<std::size_t>(address - base);
+    const usize offset = static_cast<usize>(address - base);
 
     if (offset >= m_offset)
     {
@@ -83,12 +84,12 @@ void StackAllocator::reset() noexcept
     m_stats.usedMemory = 0;
 }
 
-std::size_t StackAllocator::usedMemory() const noexcept
+usize StackAllocator::usedMemory() const noexcept
 {
     return m_offset;
 }
 
-std::size_t StackAllocator::totalMemory() const noexcept
+usize StackAllocator::totalMemory() const noexcept
 {
     return m_capacity;
 }
@@ -124,7 +125,7 @@ void StackAllocator::freeToMarker(StackMarker marker) noexcept
     m_stats.usedMemory = marker;
 }
 
-std::size_t StackAllocator::capacity() const noexcept
+usize StackAllocator::capacity() const noexcept
 {
     return m_capacity;
 }

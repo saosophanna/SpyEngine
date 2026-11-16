@@ -4,29 +4,30 @@
 
 #include "core/math/common/constants.hpp"
 #include "core/math/common/math_utils.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
-[[nodiscard]] constexpr float linear(float amount)
+[[nodiscard]] constexpr float32 linear(float32 amount)
 {
     return amount;
 }
 
-[[nodiscard]] constexpr float easeInQuad(float amount)
+[[nodiscard]] constexpr float32 easeInQuad(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
     return value * value;
 }
 
-[[nodiscard]] constexpr float easeOutQuad(float amount)
+[[nodiscard]] constexpr float32 easeOutQuad(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
     return value * (2.0f - value);
 }
 
-[[nodiscard]] constexpr float easeInOutQuad(float amount)
+[[nodiscard]] constexpr float32 easeInOutQuad(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
 
     if (value < 0.5f)
     {
@@ -36,52 +37,52 @@ namespace spy::math {
     return -1.0f + (4.0f - 2.0f * value) * value;
 }
 
-[[nodiscard]] constexpr float easeInCubic(float amount)
+[[nodiscard]] constexpr float32 easeInCubic(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
     return value * value * value;
 }
 
-[[nodiscard]] constexpr float easeOutCubic(float amount)
+[[nodiscard]] constexpr float32 easeOutCubic(float32 amount)
 {
-    const float value = saturate(amount) - 1.0f;
+    const float32 value = saturate(amount) - 1.0f;
     return value * value * value + 1.0f;
 }
 
-[[nodiscard]] constexpr float easeInOutCubic(float amount)
+[[nodiscard]] constexpr float32 easeInOutCubic(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
 
     if (value < 0.5f)
     {
         return 4.0f * value * value * value;
     }
 
-    const float shifted = 2.0f * value - 2.0f;
+    const float32 shifted = 2.0f * value - 2.0f;
     return 0.5f * shifted * shifted * shifted + 1.0f;
 }
 
-[[nodiscard]] inline float easeInSine(float amount)
+[[nodiscard]] inline float32 easeInSine(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
     return 1.0f - std::cos(value * constants::kHalfPi);
 }
 
-[[nodiscard]] inline float easeOutSine(float amount)
+[[nodiscard]] inline float32 easeOutSine(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
     return std::sin(value * constants::kHalfPi);
 }
 
-[[nodiscard]] inline float easeInOutSine(float amount)
+[[nodiscard]] inline float32 easeInOutSine(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
     return -(std::cos(constants::kPi * value) - 1.0f) * 0.5f;
 }
 
-[[nodiscard]] inline float easeInExpo(float amount)
+[[nodiscard]] inline float32 easeInExpo(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
 
     if (value <= 0.0f)
     {
@@ -91,9 +92,9 @@ namespace spy::math {
     return std::pow(2.0f, 10.0f * value - 10.0f);
 }
 
-[[nodiscard]] inline float easeOutExpo(float amount)
+[[nodiscard]] inline float32 easeOutExpo(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
 
     if (value >= 1.0f)
     {
@@ -103,9 +104,9 @@ namespace spy::math {
     return 1.0f - std::pow(2.0f, -10.0f * value);
 }
 
-[[nodiscard]] inline float easeInOutExpo(float amount)
+[[nodiscard]] inline float32 easeInOutExpo(float32 amount)
 {
-    const float value = saturate(amount);
+    const float32 value = saturate(amount);
 
     if (value <= 0.0f)
     {
@@ -125,35 +126,35 @@ namespace spy::math {
     return 1.0f - 0.5f * std::pow(2.0f, -20.0f * value + 10.0f);
 }
 
-[[nodiscard]] constexpr float easeInBack(float amount)
+[[nodiscard]] constexpr float32 easeInBack(float32 amount)
 {
-    constexpr float kOvershoot = 1.70158f;
-    constexpr float kAdjusted = kOvershoot + 1.0f;
-    const float value = saturate(amount);
+    constexpr float32 kOvershoot = 1.70158f;
+    constexpr float32 kAdjusted = kOvershoot + 1.0f;
+    const float32 value = saturate(amount);
     return kAdjusted * value * value * value - kOvershoot * value * value;
 }
 
-[[nodiscard]] constexpr float easeOutBack(float amount)
+[[nodiscard]] constexpr float32 easeOutBack(float32 amount)
 {
-    constexpr float kOvershoot = 1.70158f;
-    constexpr float kAdjusted = kOvershoot + 1.0f;
-    const float value = saturate(amount) - 1.0f;
+    constexpr float32 kOvershoot = 1.70158f;
+    constexpr float32 kAdjusted = kOvershoot + 1.0f;
+    const float32 value = saturate(amount) - 1.0f;
     return 1.0f + kAdjusted * value * value * value + kOvershoot * value * value;
 }
 
-[[nodiscard]] constexpr float easeInOutBack(float amount)
+[[nodiscard]] constexpr float32 easeInOutBack(float32 amount)
 {
-    constexpr float kOvershoot = 1.70158f;
-    constexpr float kAdjusted = kOvershoot * 1.525f;
-    const float value = saturate(amount);
+    constexpr float32 kOvershoot = 1.70158f;
+    constexpr float32 kAdjusted = kOvershoot * 1.525f;
+    const float32 value = saturate(amount);
 
     if (value < 0.5f)
     {
-        const float doubled = 2.0f * value;
+        const float32 doubled = 2.0f * value;
         return 0.5f * doubled * doubled * ((kAdjusted + 1.0f) * doubled - kAdjusted);
     }
 
-    const float shifted = 2.0f * value - 2.0f;
+    const float32 shifted = 2.0f * value - 2.0f;
     return 0.5f * (shifted * shifted * ((kAdjusted + 1.0f) * shifted + kAdjusted) + 2.0f);
 }
 

@@ -3,19 +3,20 @@
 #include <new>
 
 #include "core/memory/allocators/free_list_allocator.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
 namespace {
 
-constexpr std::size_t kMinRemainderSize = sizeof(void*);
-constexpr std::size_t kAllocationMagic = 0x5350594Du;
+constexpr usize kMinRemainderSize = sizeof(void*);
+constexpr usize kAllocationMagic = 0x5350594Du;
 
 }
 
 struct FreeListAllocator::BlockHeader
 {
-    std::size_t size = 0;
+    usize size = 0;
     BlockHeader* previous = nullptr;
     BlockHeader* next = nullptr;
     BlockHeader* previousFree = nullptr;
@@ -27,10 +28,10 @@ struct FreeListAllocator::AllocationHeader
 {
     BlockHeader* block = nullptr;
     void* pointer = nullptr;
-    std::size_t magic = 0;
+    usize magic = 0;
 };
 
-FreeListAllocator::FreeListAllocator(std::size_t capacity, IAllocator* backingAllocator)
+FreeListAllocator::FreeListAllocator(usize capacity, IAllocator* backingAllocator)
     : m_backingAllocator(backingAllocator)
 {
     if (capacity < sizeof(BlockHeader) + sizeof(AllocationHeader) + kMinRemainderSize)
@@ -38,7 +39,7 @@ FreeListAllocator::FreeListAllocator(std::size_t capacity, IAllocator* backingAl
         return;
     }
 
-    m_memory = static_cast<std::byte*>(allocateBacking(capacity, alignof(BlockHeader)));
+    m_memory = static_cast<byte*>(allocateBacking(capacity, alignof(BlockHeader)));
 
     if (m_memory == nullptr)
     {
@@ -55,7 +56,7 @@ FreeListAllocator::~FreeListAllocator()
     deallocateBacking(m_memory);
 }
 
-void* FreeListAllocator::allocate(std::size_t size, std::size_t alignment) noexcept
+void* FreeListAllocator::allocate(usize size, usize alignment) noexcept
 {
     if (size == 0 || !isPowerOfTwo(alignment) || m_freeList == nullptr)
     {
@@ -63,13 +64,13 @@ void* FreeListAllocator::allocate(std::size_t size, std::size_t alignment) noexc
         return nullptr;
     }
 
-    const std::size_t effectiveAlignment =
+    const usize effectiveAlignment =
         alignment < alignof(AllocationHeader) ? alignof(AllocationHeader) : alignment;
 
     for (BlockHeader* block = m_freeList; block != nullptr; block = block->nextFree)
     {
         const std::uintptr_t blockAddress = reinterpret_cast<std::uintptr_t>(block);
-        const std::size_t headerSize = sizeof(BlockHeader) + sizeof(AllocationHeader);
+        const usize headerSize = sizeof(BlockHeader) + sizeof(AllocationHeader);
 
         if (block->size < headerSize)
         {
@@ -77,8 +78,8 @@ void* FreeListAllocator::allocate(std::size_t size, std::size_t alignment) noexc
         }
 
         const std::uintptr_t payloadAddress = blockAddress + headerSize;
-        const std::size_t padding = alignmentPadding(payloadAddress, effectiveAlignment);
-        const std::size_t available = block->size - headerSize;
+        const usize padding = alignmentPadding(payloadAddress, effectiveAlignment);
+        const usize available = block->size - headerSize;
 
         if (padding > available || size > available - padding)
         {
@@ -92,13 +93,13 @@ void* FreeListAllocator::allocate(std::size_t size, std::size_t alignment) noexc
 
         removeFreeBlock(block);
 
-        std::size_t usedSize = block->size;
+        usize usedSize = block->size;
 
         if (remainderAddress < blockEnd &&
             blockEnd - remainderAddress >= sizeof(BlockHeader) + kMinRemainderSize)
         {
-            const std::size_t remainderSize = static_cast<std::size_t>(blockEnd - remainderAddress);
-            usedSize = static_cast<std::size_t>(remainderAddress - blockAddress);
+            const usize remainderSize = static_cast<usize>(blockEnd - remainderAddress);
+            usedSize = static_cast<usize>(remainderAddress - blockAddress);
 
             auto* remainder = ::new (reinterpret_cast<void*>(remainderAddress)) BlockHeader{};
             remainder->size = remainderSize;
@@ -231,12 +232,12 @@ void FreeListAllocator::reset() noexcept
     m_stats.usedMemory = 0;
 }
 
-std::size_t FreeListAllocator::usedMemory() const noexcept
+usize FreeListAllocator::usedMemory() const noexcept
 {
     return m_stats.usedMemory;
 }
 
-std::size_t FreeListAllocator::totalMemory() const noexcept
+usize FreeListAllocator::totalMemory() const noexcept
 {
     return m_capacity;
 }
@@ -256,14 +257,14 @@ AllocatorCapabilities FreeListAllocator::capabilities() const noexcept
     return capabilities;
 }
 
-std::size_t FreeListAllocator::capacity() const noexcept
+usize FreeListAllocator::capacity() const noexcept
 {
     return m_capacity;
 }
 
-std::size_t FreeListAllocator::freeMemory() const noexcept
+usize FreeListAllocator::freeMemory() const noexcept
 {
-    std::size_t total = 0;
+    usize total = 0;
 
     for (const BlockHeader* block = m_freeList; block != nullptr; block = block->nextFree)
     {
@@ -273,9 +274,9 @@ std::size_t FreeListAllocator::freeMemory() const noexcept
     return total;
 }
 
-std::size_t FreeListAllocator::largestFreeBlock() const noexcept
+usize FreeListAllocator::largestFreeBlock() const noexcept
 {
-    std::size_t largest = 0;
+    usize largest = 0;
 
     for (const BlockHeader* block = m_freeList; block != nullptr; block = block->nextFree)
     {
@@ -288,7 +289,7 @@ std::size_t FreeListAllocator::largestFreeBlock() const noexcept
     return largest;
 }
 
-void* FreeListAllocator::allocateBacking(std::size_t size, std::size_t alignment) noexcept
+void* FreeListAllocator::allocateBacking(usize size, usize alignment) noexcept
 {
     if (m_backingAllocator != nullptr)
     {

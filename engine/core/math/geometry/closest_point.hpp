@@ -6,6 +6,7 @@
 #include "core/math/geometry/rect.hpp"
 #include "core/math/vector/vec2.hpp"
 #include "core/math/vector/vec3.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
@@ -26,14 +27,14 @@ namespace spy::math {
                                                     const Vec2& end)
 {
     const Vec2 edge = end - start;
-    const float lengthSquared = edge.lengthSquared();
+    const float32 lengthSquared = edge.lengthSquared();
 
     if (lengthSquared <= constants::kEpsilon * constants::kEpsilon)
     {
         return start;
     }
 
-    const float amount = clamp((point - start).dot(edge) / lengthSquared, 0.0f, 1.0f);
+    const float32 amount = clamp((point - start).dot(edge) / lengthSquared, 0.0f, 1.0f);
     return start + edge * amount;
 }
 

@@ -2,36 +2,37 @@
 #include <cstdint>
 
 #include "core/time/fixed_timestep.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::time {
 
 namespace {
 
-double normalizedFixedDelta(double value)
+float64 normalizedFixedDelta(float64 value)
 {
     return std::isfinite(value) && value > 0.0 ? value : kDefaultFixedDelta;
 }
 
-double nonNegativeDelta(double value)
+float64 nonNegativeDelta(float64 value)
 {
     return std::isfinite(value) && value > 0.0 ? value : 0.0;
 }
 
 }
 
-FixedTimeStep::FixedTimeStep(double fixedDelta)
+FixedTimeStep::FixedTimeStep(float64 fixedDelta)
     : m_fixedDelta(normalizedFixedDelta(fixedDelta))
 {
 }
 
-void FixedTimeStep::configure(double fixedDelta)
+void FixedTimeStep::configure(float64 fixedDelta)
 {
     m_fixedDelta = normalizedFixedDelta(fixedDelta);
     m_accumulator = 0.0;
     m_stepsThisFrame = 0;
 }
 
-void FixedTimeStep::addFrameTime(double deltaTime)
+void FixedTimeStep::addFrameTime(float64 deltaTime)
 {
     m_stepsThisFrame = 0;
     m_accumulator += nonNegativeDelta(deltaTime);
@@ -66,14 +67,14 @@ bool FixedTimeStep::consumeStep()
     return true;
 }
 
-double FixedTimeStep::deltaTime() const noexcept
+float64 FixedTimeStep::deltaTime() const noexcept
 {
     return m_fixedDelta;
 }
 
-double FixedTimeStep::interpolationAlpha() const noexcept
+float64 FixedTimeStep::interpolationAlpha() const noexcept
 {
-    const double alpha = m_accumulator / m_fixedDelta;
+    const float64 alpha = m_accumulator / m_fixedDelta;
 
     if (!(alpha > 0.0))
     {
@@ -83,7 +84,7 @@ double FixedTimeStep::interpolationAlpha() const noexcept
     return alpha < 1.0 ? alpha : 1.0;
 }
 
-std::uint32_t FixedTimeStep::stepsThisFrame() const noexcept
+uint32 FixedTimeStep::stepsThisFrame() const noexcept
 {
     return m_stepsThisFrame;
 }
@@ -93,20 +94,20 @@ bool FixedTimeStep::reachedStepLimit() const noexcept
     return m_stepsThisFrame >= m_maxStepsPerFrame;
 }
 
-std::uint64_t FixedTimeStep::simulationTick() const noexcept
+uint64 FixedTimeStep::simulationTick() const noexcept
 {
     return m_simulationTick;
 }
 
-double FixedTimeStep::droppedTime() const noexcept
+float64 FixedTimeStep::droppedTime() const noexcept
 {
     return m_droppedTime;
 }
 
 void FixedTimeStep::discardExcessBacklog()
 {
-    const double remainder = std::fmod(m_accumulator, m_fixedDelta);
-    const double discarded = m_accumulator - remainder;
+    const float64 remainder = std::fmod(m_accumulator, m_fixedDelta);
+    const float64 discarded = m_accumulator - remainder;
 
     if (discarded <= 0.0)
     {
@@ -125,7 +126,7 @@ void FixedTimeStep::reset()
     m_stepsThisFrame = 0;
 }
 
-void FixedTimeStep::setMaxStepsPerFrame(std::uint32_t maxSteps)
+void FixedTimeStep::setMaxStepsPerFrame(uint32 maxSteps)
 {
     m_maxStepsPerFrame = maxSteps > 0 ? maxSteps : 1;
 }

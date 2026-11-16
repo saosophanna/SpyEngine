@@ -2,37 +2,39 @@
 
 #include <cstdint>
 
+#include "core/utilities/types/types.hpp"
+
 namespace spy::time {
 
-inline constexpr double kDefaultFixedDelta = 1.0 / 60.0;
-inline constexpr double kMaxFrameDelta = 0.25;
-inline constexpr std::uint32_t kMaxFixedStepsPerFrame = 5;
+inline constexpr float64 kDefaultFixedDelta = 1.0 / 60.0;
+inline constexpr float64 kMaxFrameDelta = 0.25;
+inline constexpr uint32 kMaxFixedStepsPerFrame = 5;
 
 struct Timestep
 {
-    double seconds = 0.0;
+    float64 seconds = 0.0;
 
-    [[nodiscard]] static constexpr Timestep fromSeconds(double value) noexcept
+    [[nodiscard]] static constexpr Timestep fromSeconds(float64 value) noexcept
     {
         return Timestep{value};
     }
 
-    [[nodiscard]] static constexpr Timestep fromMilliseconds(double value) noexcept
+    [[nodiscard]] static constexpr Timestep fromMilliseconds(float64 value) noexcept
     {
         return Timestep{value / 1000.0};
     }
 
-    [[nodiscard]] constexpr double milliseconds() const noexcept
+    [[nodiscard]] constexpr float64 milliseconds() const noexcept
     {
         return seconds * 1000.0;
     }
 
-    [[nodiscard]] constexpr Timestep scaledBy(double factor) const noexcept
+    [[nodiscard]] constexpr Timestep scaledBy(float64 factor) const noexcept
     {
         return Timestep{seconds * factor};
     }
 
-    [[nodiscard]] constexpr Timestep clampedTo(double maximumSeconds) const noexcept
+    [[nodiscard]] constexpr Timestep clampedTo(float64 maximumSeconds) const noexcept
     {
         if (!(seconds > 0.0) || !(maximumSeconds > 0.0))
         {

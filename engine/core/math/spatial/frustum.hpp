@@ -10,12 +10,13 @@
 #include "core/math/spatial/plane.hpp"
 #include "core/math/vector/vec3.hpp"
 #include "core/math/vector/vec4.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math::detail {
 
-[[nodiscard]] inline Plane planeFromCoefficients(float x, float y, float z, float constant)
+[[nodiscard]] inline Plane planeFromCoefficients(float32 x, float32 y, float32 z, float32 constant)
 {
-    const float length = std::sqrt(x * x + y * y + z * z);
+    const float32 length = std::sqrt(x * x + y * y + z * z);
 
     if (length <= constants::kEpsilon)
     {
@@ -56,7 +57,7 @@ struct Frustum
         return true;
     }
 
-    [[nodiscard]] inline bool intersectsSphere(const Vec3& center, float radius) const
+    [[nodiscard]] inline bool intersectsSphere(const Vec3& center, float32 radius) const
     {
         for (const Plane& plane : planes)
         {

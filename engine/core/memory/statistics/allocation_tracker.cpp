@@ -2,13 +2,14 @@
 #include <limits>
 
 #include "core/memory/statistics/allocation_tracker.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
-AllocationTracker::AllocationTracker(std::size_t capacity)
+AllocationTracker::AllocationTracker(usize capacity)
 {
     if (capacity == 0 ||
-        capacity > std::numeric_limits<std::size_t>::max() / sizeof(AllocationRecord))
+        capacity > std::numeric_limits<usize>::max() / sizeof(AllocationRecord))
     {
         return;
     }
@@ -31,8 +32,8 @@ AllocationTracker::~AllocationTracker()
 
 bool AllocationTracker::track(
     void* address,
-    std::size_t size,
-    std::size_t alignment,
+    usize size,
+    usize alignment,
     std::source_location location) noexcept
 {
     if (address == nullptr || m_count >= m_capacity || contains(address))
@@ -60,7 +61,7 @@ bool AllocationTracker::release(void* address) noexcept
         return false;
     }
 
-    for (std::size_t index = 0; index < m_count; ++index)
+    for (usize index = 0; index < m_count; ++index)
     {
         if (m_records[index].address != address)
         {
@@ -87,7 +88,7 @@ bool AllocationTracker::release(void* address) noexcept
 
 const AllocationRecord* AllocationTracker::find(void* address) const noexcept
 {
-    for (std::size_t index = 0; index < m_count; ++index)
+    for (usize index = 0; index < m_count; ++index)
     {
         if (m_records[index].address == address)
         {
@@ -103,27 +104,27 @@ bool AllocationTracker::contains(void* address) const noexcept
     return find(address) != nullptr;
 }
 
-std::size_t AllocationTracker::liveCount() const noexcept
+usize AllocationTracker::liveCount() const noexcept
 {
     return m_count;
 }
 
-std::size_t AllocationTracker::liveBytes() const noexcept
+usize AllocationTracker::liveBytes() const noexcept
 {
     return m_liveBytes;
 }
 
-std::size_t AllocationTracker::capacity() const noexcept
+usize AllocationTracker::capacity() const noexcept
 {
     return m_capacity;
 }
 
-std::size_t AllocationTracker::overflowCount() const noexcept
+usize AllocationTracker::overflowCount() const noexcept
 {
     return m_overflowCount;
 }
 
-std::size_t AllocationTracker::invalidReleaseCount() const noexcept
+usize AllocationTracker::invalidReleaseCount() const noexcept
 {
     return m_invalidReleaseCount;
 }
@@ -143,7 +144,7 @@ void AllocationTracker::clear() noexcept
     m_releaseHistoryCount = 0;
     m_releaseHistoryNext = 0;
 
-    for (std::size_t index = 0; index < kReleaseHistoryCapacity; ++index)
+    for (usize index = 0; index < kReleaseHistoryCapacity; ++index)
     {
         m_releaseHistory[index] = nullptr;
     }
@@ -151,7 +152,7 @@ void AllocationTracker::clear() noexcept
 
 bool AllocationTracker::wasRecentlyReleased(const void* address) const noexcept
 {
-    for (std::size_t index = 0; index < m_releaseHistoryCount; ++index)
+    for (usize index = 0; index < m_releaseHistoryCount; ++index)
     {
         if (m_releaseHistory[index] == address)
         {

@@ -8,12 +8,13 @@
 #include "core/math/common/math_utils.hpp"
 #include "core/math/vector/vec3.hpp"
 #include "core/math/vector/vec4.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
 struct Mat4
 {
-    std::array<float, 16> elements{1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    std::array<float32, 16> elements{1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
                                    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
     [[nodiscard]] static constexpr Mat4 identity()
@@ -30,7 +31,7 @@ struct Mat4
         return result;
     }
 
-    [[nodiscard]] static inline Mat4 rotation(float radians, const Vec3& axis)
+    [[nodiscard]] static inline Mat4 rotation(float32 radians, const Vec3& axis)
     {
         const Vec3 normalizedAxis = axis.normalized();
 
@@ -39,16 +40,16 @@ struct Mat4
             return identity();
         }
 
-        const float cosine = std::cos(radians);
-        const float sine = std::sin(radians);
-        const float complement = 1.0f - cosine;
+        const float32 cosine = std::cos(radians);
+        const float32 sine = std::sin(radians);
+        const float32 complement = 1.0f - cosine;
 
-        const float xx = normalizedAxis.x * normalizedAxis.x;
-        const float yy = normalizedAxis.y * normalizedAxis.y;
-        const float zz = normalizedAxis.z * normalizedAxis.z;
-        const float xy = normalizedAxis.x * normalizedAxis.y;
-        const float xz = normalizedAxis.x * normalizedAxis.z;
-        const float yz = normalizedAxis.y * normalizedAxis.z;
+        const float32 xx = normalizedAxis.x * normalizedAxis.x;
+        const float32 yy = normalizedAxis.y * normalizedAxis.y;
+        const float32 zz = normalizedAxis.z * normalizedAxis.z;
+        const float32 xy = normalizedAxis.x * normalizedAxis.y;
+        const float32 xz = normalizedAxis.x * normalizedAxis.z;
+        const float32 yz = normalizedAxis.y * normalizedAxis.z;
 
         Mat4 result;
         result.element(0, 0) = complement * xx + cosine;
@@ -63,10 +64,10 @@ struct Mat4
         return result;
     }
 
-    [[nodiscard]] static inline Mat4 rotationX(float radians)
+    [[nodiscard]] static inline Mat4 rotationX(float32 radians)
     {
-        const float cosine = std::cos(radians);
-        const float sine = std::sin(radians);
+        const float32 cosine = std::cos(radians);
+        const float32 sine = std::sin(radians);
 
         Mat4 result;
         result.element(1, 1) = cosine;
@@ -76,10 +77,10 @@ struct Mat4
         return result;
     }
 
-    [[nodiscard]] static inline Mat4 rotationY(float radians)
+    [[nodiscard]] static inline Mat4 rotationY(float32 radians)
     {
-        const float cosine = std::cos(radians);
-        const float sine = std::sin(radians);
+        const float32 cosine = std::cos(radians);
+        const float32 sine = std::sin(radians);
 
         Mat4 result;
         result.element(0, 0) = cosine;
@@ -89,10 +90,10 @@ struct Mat4
         return result;
     }
 
-    [[nodiscard]] static inline Mat4 rotationZ(float radians)
+    [[nodiscard]] static inline Mat4 rotationZ(float32 radians)
     {
-        const float cosine = std::cos(radians);
-        const float sine = std::sin(radians);
+        const float32 cosine = std::cos(radians);
+        const float32 sine = std::sin(radians);
 
         Mat4 result;
         result.element(0, 0) = cosine;
@@ -111,8 +112,8 @@ struct Mat4
         return result;
     }
 
-    [[nodiscard]] static inline Mat4 perspective(float fieldOfViewRadians, float aspect,
-                                                 float nearPlane, float farPlane)
+    [[nodiscard]] static inline Mat4 perspective(float32 fieldOfViewRadians, float32 aspect,
+                                                 float32 nearPlane, float32 farPlane)
     {
         if (fieldOfViewRadians <= 0.0f || aspect <= 0.0f || nearPlane <= 0.0f ||
             farPlane <= nearPlane)
@@ -120,9 +121,9 @@ struct Mat4
             return identity();
         }
 
-        const float focal = 1.0f / std::tan(fieldOfViewRadians * 0.5f);
-        const float depthScale = farPlane / (nearPlane - farPlane);
-        const float depthShift = farPlane * nearPlane / (nearPlane - farPlane);
+        const float32 focal = 1.0f / std::tan(fieldOfViewRadians * 0.5f);
+        const float32 depthScale = farPlane / (nearPlane - farPlane);
+        const float32 depthShift = farPlane * nearPlane / (nearPlane - farPlane);
 
         Mat4 result;
         result.element(0, 0) = focal / aspect;
@@ -134,8 +135,8 @@ struct Mat4
         return result;
     }
 
-    [[nodiscard]] static inline Mat4 perspectiveOpenGl(float fieldOfViewRadians, float aspect,
-                                                       float nearPlane, float farPlane)
+    [[nodiscard]] static inline Mat4 perspectiveOpenGl(float32 fieldOfViewRadians, float32 aspect,
+                                                       float32 nearPlane, float32 farPlane)
     {
         if (fieldOfViewRadians <= 0.0f || aspect <= 0.0f || nearPlane <= 0.0f ||
             farPlane <= nearPlane)
@@ -143,7 +144,7 @@ struct Mat4
             return identity();
         }
 
-        const float focal = 1.0f / std::tan(fieldOfViewRadians * 0.5f);
+        const float32 focal = 1.0f / std::tan(fieldOfViewRadians * 0.5f);
 
         Mat4 result;
         result.element(0, 0) = focal / aspect;
@@ -155,8 +156,8 @@ struct Mat4
         return result;
     }
 
-    [[nodiscard]] static inline Mat4 orthographic(float left, float right, float bottom, float top,
-                                                  float nearPlane, float farPlane)
+    [[nodiscard]] static inline Mat4 orthographic(float32 left, float32 right, float32 bottom,
+                                                  float32 top, float32 nearPlane, float32 farPlane)
     {
         if (right <= left || top <= bottom || farPlane <= nearPlane)
         {
@@ -173,8 +174,9 @@ struct Mat4
         return result;
     }
 
-    [[nodiscard]] static inline Mat4 orthographicOpenGl(float left, float right, float bottom,
-                                                        float top, float nearPlane, float farPlane)
+    [[nodiscard]] static inline Mat4 orthographicOpenGl(float32 left, float32 right,
+                                                        float32 bottom, float32 top,
+                                                        float32 nearPlane, float32 farPlane)
     {
         if (right <= left || top <= bottom || farPlane <= nearPlane)
         {
@@ -227,12 +229,12 @@ struct Mat4
         return result;
     }
 
-    [[nodiscard]] constexpr float element(std::size_t column, std::size_t row) const
+    [[nodiscard]] constexpr float32 element(usize column, usize row) const
     {
         return elements[column * 4 + row];
     }
 
-    constexpr float& element(std::size_t column, std::size_t row)
+    constexpr float32& element(usize column, usize row)
     {
         return elements[column * 4 + row];
     }
@@ -241,13 +243,13 @@ struct Mat4
     {
         Mat4 result;
 
-        for (std::size_t column = 0; column < 4; ++column)
+        for (usize column = 0; column < 4; ++column)
         {
-            for (std::size_t row = 0; row < 4; ++row)
+            for (usize row = 0; row < 4; ++row)
             {
-                float sum = 0.0f;
+                float32 sum = 0.0f;
 
-                for (std::size_t index = 0; index < 4; ++index)
+                for (usize index = 0; index < 4; ++index)
                 {
                     sum += element(index, row) * other.element(column, index);
                 }
@@ -283,7 +285,7 @@ struct Mat4
 
         if (absValue(transformed.w) > constants::kEpsilon)
         {
-            const float inverseW = 1.0f / transformed.w;
+            const float32 inverseW = 1.0f / transformed.w;
             return Vec3{transformed.x * inverseW, transformed.y * inverseW,
                         transformed.z * inverseW};
         }
@@ -302,9 +304,9 @@ struct Mat4
     {
         Mat4 result;
 
-        for (std::size_t column = 0; column < 4; ++column)
+        for (usize column = 0; column < 4; ++column)
         {
-            for (std::size_t row = 0; row < 4; ++row)
+            for (usize row = 0; row < 4; ++row)
             {
                 result.element(column, row) = element(row, column);
             }
@@ -315,26 +317,26 @@ struct Mat4
 
     [[nodiscard]] inline bool inverse(Mat4& result) const
     {
-        double augmented[4][8] = {};
+        float64 augmented[4][8] = {};
 
-        for (std::size_t row = 0; row < 4; ++row)
+        for (usize row = 0; row < 4; ++row)
         {
-            for (std::size_t column = 0; column < 4; ++column)
+            for (usize column = 0; column < 4; ++column)
             {
-                augmented[row][column] = static_cast<double>(element(column, row));
+                augmented[row][column] = static_cast<float64>(element(column, row));
             }
 
             augmented[row][row + 4] = 1.0;
         }
 
-        for (std::size_t pivotIndex = 0; pivotIndex < 4; ++pivotIndex)
+        for (usize pivotIndex = 0; pivotIndex < 4; ++pivotIndex)
         {
-            std::size_t pivotRow = pivotIndex;
-            double pivotMagnitude = std::fabs(augmented[pivotIndex][pivotIndex]);
+            usize pivotRow = pivotIndex;
+            float64 pivotMagnitude = std::fabs(augmented[pivotIndex][pivotIndex]);
 
-            for (std::size_t row = pivotIndex + 1; row < 4; ++row)
+            for (usize row = pivotIndex + 1; row < 4; ++row)
             {
-                const double magnitude = std::fabs(augmented[row][pivotIndex]);
+                const float64 magnitude = std::fabs(augmented[row][pivotIndex]);
 
                 if (magnitude > pivotMagnitude)
                 {
@@ -350,47 +352,47 @@ struct Mat4
 
             if (pivotRow != pivotIndex)
             {
-                for (std::size_t column = 0; column < 8; ++column)
+                for (usize column = 0; column < 8; ++column)
                 {
-                    const double temporary = augmented[pivotIndex][column];
+                    const float64 temporary = augmented[pivotIndex][column];
                     augmented[pivotIndex][column] = augmented[pivotRow][column];
                     augmented[pivotRow][column] = temporary;
                 }
             }
 
-            const double pivot = augmented[pivotIndex][pivotIndex];
+            const float64 pivot = augmented[pivotIndex][pivotIndex];
 
-            for (std::size_t column = 0; column < 8; ++column)
+            for (usize column = 0; column < 8; ++column)
             {
                 augmented[pivotIndex][column] /= pivot;
             }
 
-            for (std::size_t row = 0; row < 4; ++row)
+            for (usize row = 0; row < 4; ++row)
             {
                 if (row == pivotIndex)
                 {
                     continue;
                 }
 
-                const double factor = augmented[row][pivotIndex];
+                const float64 factor = augmented[row][pivotIndex];
 
                 if (factor == 0.0)
                 {
                     continue;
                 }
 
-                for (std::size_t column = 0; column < 8; ++column)
+                for (usize column = 0; column < 8; ++column)
                 {
                     augmented[row][column] -= factor * augmented[pivotIndex][column];
                 }
             }
         }
 
-        for (std::size_t row = 0; row < 4; ++row)
+        for (usize row = 0; row < 4; ++row)
         {
-            for (std::size_t column = 0; column < 4; ++column)
+            for (usize column = 0; column < 4; ++column)
             {
-                result.element(column, row) = static_cast<float>(augmented[row][column + 4]);
+                result.element(column, row) = static_cast<float32>(augmented[row][column + 4]);
             }
         }
 
@@ -399,9 +401,9 @@ struct Mat4
 };
 
 [[nodiscard]] inline bool nearlyEqual(const Mat4& first, const Mat4& second,
-                                      float tolerance = constants::kEpsilon)
+                                      float32 tolerance = constants::kEpsilon)
 {
-    for (std::size_t index = 0; index < first.elements.size(); ++index)
+    for (usize index = 0; index < first.elements.size(); ++index)
     {
         if (!nearlyEqual(first.elements[index], second.elements[index], tolerance))
         {

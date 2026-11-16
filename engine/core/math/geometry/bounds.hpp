@@ -5,15 +5,16 @@
 #include "core/math/common/math_utils.hpp"
 #include "core/math/geometry/aabb.hpp"
 #include "core/math/vector/vec3.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::math {
 
 struct Bounds
 {
-    Vec3 min{std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-             std::numeric_limits<float>::max()};
-    Vec3 max{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
-             std::numeric_limits<float>::lowest()};
+    Vec3 min{std::numeric_limits<float32>::max(), std::numeric_limits<float32>::max(),
+             std::numeric_limits<float32>::max()};
+    Vec3 max{std::numeric_limits<float32>::lowest(), std::numeric_limits<float32>::lowest(),
+             std::numeric_limits<float32>::lowest()};
 
     [[nodiscard]] constexpr bool valid() const
     {
@@ -22,10 +23,10 @@ struct Bounds
 
     void reset()
     {
-        min = Vec3{std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-                   std::numeric_limits<float>::max()};
-        max = Vec3{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
-                   std::numeric_limits<float>::lowest()};
+        min = Vec3{std::numeric_limits<float32>::max(), std::numeric_limits<float32>::max(),
+                   std::numeric_limits<float32>::max()};
+        max = Vec3{std::numeric_limits<float32>::lowest(), std::numeric_limits<float32>::lowest(),
+                   std::numeric_limits<float32>::lowest()};
     }
 
     void expand(const Vec3& point)

@@ -3,6 +3,7 @@
 #include <thread>
 
 #include "core/time/frame_limiter.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::time {
 
@@ -12,7 +13,7 @@ constexpr std::chrono::milliseconds kSpinThreshold{1};
 
 }
 
-void FrameLimiter::setTargetFps(std::uint32_t fps)
+void FrameLimiter::setTargetFps(uint32 fps)
 {
     m_targetFps = fps;
 }
@@ -22,7 +23,7 @@ void FrameLimiter::setUnlimited()
     m_targetFps = 0;
 }
 
-std::uint32_t FrameLimiter::targetFps() const noexcept
+uint32 FrameLimiter::targetFps() const noexcept
 {
     return m_targetFps;
 }
@@ -67,8 +68,8 @@ void FrameLimiter::endFrame()
 
 Clock::Duration FrameLimiter::targetFrameDuration() const noexcept
 {
-    const double seconds = 1.0 / static_cast<double>(m_targetFps);
-    return std::chrono::duration_cast<Clock::Duration>(std::chrono::duration<double>(seconds));
+    const float64 seconds = 1.0 / static_cast<float64>(m_targetFps);
+    return std::chrono::duration_cast<Clock::Duration>(std::chrono::duration<float64>(seconds));
 }
 
 }

@@ -2,12 +2,14 @@
 
 #include <cstdint>
 
+#include "core/utilities/types/types.hpp"
+
 namespace spy::time {
 
 class Timer
 {
 public:
-    explicit Timer(double duration = 0.0, bool repeating = false);
+    explicit Timer(float64 duration = 0.0, bool repeating = false);
 
     void start();
     void stop();
@@ -16,23 +18,23 @@ public:
     void pause();
     void resume();
 
-    std::uint32_t tick(double deltaTime);
+    uint32 tick(float64 deltaTime);
 
     [[nodiscard]] bool isRunning() const noexcept;
     [[nodiscard]] bool isPaused() const noexcept;
     [[nodiscard]] bool isFinished() const noexcept;
 
-    [[nodiscard]] double duration() const noexcept;
-    [[nodiscard]] double elapsed() const noexcept;
-    [[nodiscard]] double remaining() const noexcept;
-    [[nodiscard]] double progress() const noexcept;
+    [[nodiscard]] float64 duration() const noexcept;
+    [[nodiscard]] float64 elapsed() const noexcept;
+    [[nodiscard]] float64 remaining() const noexcept;
+    [[nodiscard]] float64 progress() const noexcept;
 
-    void setDuration(double duration);
+    void setDuration(float64 duration);
     void setRepeating(bool repeating) noexcept;
 
 private:
-    double m_duration = 0.0;
-    double m_elapsed = 0.0;
+    float64 m_duration = 0.0;
+    float64 m_elapsed = 0.0;
 
     bool m_running = false;
     bool m_paused = false;

@@ -461,15 +461,15 @@ int main()
         LinearAllocator linearAllocator(256);
         StackAllocator stackAllocator(256);
 
-        SPY_CHECK(!manager.registerAllocator(1, linearAllocator));
+        SPY_CHECK(!manager.registerAllocator(AllocatorId(1), linearAllocator));
         SPY_CHECK(manager.initialize());
-        SPY_CHECK(manager.registerAllocator(1, linearAllocator));
-        SPY_CHECK(manager.registerAllocator(2, stackAllocator));
-        SPY_CHECK(!manager.registerAllocator(1, stackAllocator));
+        SPY_CHECK(manager.registerAllocator(AllocatorId(1), linearAllocator));
+        SPY_CHECK(manager.registerAllocator(AllocatorId(2), stackAllocator));
+        SPY_CHECK(!manager.registerAllocator(AllocatorId(1), stackAllocator));
         SPY_CHECK(manager.allocatorCount() == 2);
-        SPY_CHECK(manager.allocator(1) == &linearAllocator);
-        SPY_CHECK(manager.allocator(2) == &stackAllocator);
-        SPY_CHECK(manager.allocator(3) == nullptr);
+        SPY_CHECK(manager.allocator(AllocatorId(1)) == &linearAllocator);
+        SPY_CHECK(manager.allocator(AllocatorId(2)) == &stackAllocator);
+        SPY_CHECK(manager.allocator(AllocatorId(3)) == nullptr);
 
         SPY_CHECK(linearAllocator.allocate(32, 8) != nullptr);
         SPY_CHECK(stackAllocator.allocate(32, 8) != nullptr);
@@ -485,15 +485,15 @@ int main()
         SPY_CHECK(linearAllocator.usedMemory() == 0);
         SPY_CHECK(stackAllocator.usedMemory() == 0);
 
-        SPY_CHECK(manager.unregisterAllocator(1));
+        SPY_CHECK(manager.unregisterAllocator(AllocatorId(1)));
         SPY_CHECK(manager.allocatorCount() == 1);
-        SPY_CHECK(manager.allocator(1) == nullptr);
-        SPY_CHECK(manager.allocator(2) == &stackAllocator);
-        SPY_CHECK(!manager.unregisterAllocator(1));
+        SPY_CHECK(manager.allocator(AllocatorId(1)) == nullptr);
+        SPY_CHECK(manager.allocator(AllocatorId(2)) == &stackAllocator);
+        SPY_CHECK(!manager.unregisterAllocator(AllocatorId(1)));
 
         manager.shutdown();
         SPY_CHECK(manager.allocatorCount() == 0);
-        SPY_CHECK(!manager.registerAllocator(5, linearAllocator));
+        SPY_CHECK(!manager.registerAllocator(AllocatorId(5), linearAllocator));
     }
 
     {
@@ -504,10 +504,10 @@ int main()
 
         for (std::uint32_t id = 1; id <= 16u; ++id)
         {
-            SPY_CHECK(manager.registerAllocator(id, shared));
+            SPY_CHECK(manager.registerAllocator(AllocatorId(id), shared));
         }
 
-        SPY_CHECK(!manager.registerAllocator(17, shared));
+        SPY_CHECK(!manager.registerAllocator(AllocatorId(17), shared));
         SPY_CHECK(manager.allocatorCount() == 16);
     }
 

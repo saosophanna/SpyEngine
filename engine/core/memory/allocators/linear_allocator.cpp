@@ -2,10 +2,11 @@
 #include <cstdint>
 
 #include "core/memory/allocators/linear_allocator.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::memory {
 
-LinearAllocator::LinearAllocator(std::size_t capacity)
+LinearAllocator::LinearAllocator(usize capacity)
 {
     if (capacity == 0)
     {
@@ -18,7 +19,7 @@ LinearAllocator::LinearAllocator(std::size_t capacity)
     m_stats.totalMemory = m_capacity;
 }
 
-LinearAllocator::LinearAllocator(void* buffer, std::size_t capacity) noexcept
+LinearAllocator::LinearAllocator(void* buffer, usize capacity) noexcept
 {
     if (buffer == nullptr || capacity == 0)
     {
@@ -38,7 +39,7 @@ LinearAllocator::~LinearAllocator()
     }
 }
 
-void* LinearAllocator::allocate(std::size_t size, std::size_t alignment) noexcept
+void* LinearAllocator::allocate(usize size, usize alignment) noexcept
 {
     if (size == 0 || m_memory == nullptr || !isPowerOfTwo(alignment))
     {
@@ -47,7 +48,7 @@ void* LinearAllocator::allocate(std::size_t size, std::size_t alignment) noexcep
     }
 
     const std::uintptr_t address = reinterpret_cast<std::uintptr_t>(m_memory) + m_offset;
-    const std::size_t padding = alignmentPadding(address, alignment);
+    const usize padding = alignmentPadding(address, alignment);
 
     if (padding > m_capacity - m_offset || size > m_capacity - m_offset - padding)
     {
@@ -77,12 +78,12 @@ void LinearAllocator::reset() noexcept
     m_stats.usedMemory = 0;
 }
 
-std::size_t LinearAllocator::usedMemory() const noexcept
+usize LinearAllocator::usedMemory() const noexcept
 {
     return m_offset;
 }
 
-std::size_t LinearAllocator::totalMemory() const noexcept
+usize LinearAllocator::totalMemory() const noexcept
 {
     return m_capacity;
 }
@@ -102,12 +103,12 @@ AllocatorCapabilities LinearAllocator::capabilities() const noexcept
     return capabilities;
 }
 
-std::size_t LinearAllocator::capacity() const noexcept
+usize LinearAllocator::capacity() const noexcept
 {
     return m_capacity;
 }
 
-std::size_t LinearAllocator::offset() const noexcept
+usize LinearAllocator::offset() const noexcept
 {
     return m_offset;
 }

@@ -2,17 +2,19 @@
 
 #include <cstddef>
 
+#include "core/utilities/types/types.hpp"
+
 namespace spy::memory {
 
 struct AllocatorStats
 {
-    std::size_t totalMemory = 0;
-    std::size_t usedMemory = 0;
-    std::size_t peakMemory = 0;
+    usize totalMemory = 0;
+    usize usedMemory = 0;
+    usize peakMemory = 0;
 
-    std::size_t allocationCount = 0;
-    std::size_t deallocationCount = 0;
-    std::size_t failedAllocationCount = 0;
+    usize allocationCount = 0;
+    usize deallocationCount = 0;
+    usize failedAllocationCount = 0;
 };
 
 }

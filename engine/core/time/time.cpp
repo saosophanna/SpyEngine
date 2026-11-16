@@ -2,12 +2,13 @@
 #include <cmath>
 
 #include "core/time/time.hpp"
+#include "core/utilities/types/types.hpp"
 
 namespace spy::time {
 
 namespace {
 
-constexpr double kFpsSmoothing = 0.1;
+constexpr float64 kFpsSmoothing = 0.1;
 
 }
 
@@ -16,7 +17,7 @@ Time::Time()
 {
 }
 
-Time::Time(double fixedDelta)
+Time::Time(float64 fixedDelta)
     : m_fixedTimeStep(fixedDelta)
 {
     initialize();
@@ -36,14 +37,14 @@ void Time::initialize()
 void Time::beginFrame()
 {
     const Clock::TimePoint current = Clock::now();
-    const double measuredSeconds =
-        m_hasLastFrame ? std::chrono::duration<double>(current - m_lastFrame).count() : 0.0;
+    const float64 measuredSeconds =
+        m_hasLastFrame ? std::chrono::duration<float64>(current - m_lastFrame).count() : 0.0;
 
     m_lastFrame = current;
     m_hasLastFrame = true;
 
     const Timestep measured = Timestep::fromSeconds(measuredSeconds).clampedTo(kMaxFrameDelta);
-    const double effectiveScale = m_paused ? 0.0 : m_timeScale;
+    const float64 effectiveScale = m_paused ? 0.0 : m_timeScale;
 
     m_frameTime.unscaledDeltaTime = measured.seconds;
     m_frameTime.deltaTime = measured.scaledBy(effectiveScale).seconds;
@@ -57,7 +58,7 @@ void Time::beginFrame()
 
 void Time::endFrame()
 {
-    const double measured = m_frameTime.unscaledDeltaTime;
+    const float64 measured = m_frameTime.unscaledDeltaTime;
 
     if (measured > 0.0)
     {
@@ -82,12 +83,12 @@ void Time::endFrame()
     m_frameTime.droppedSimulationTime = m_fixedTimeStep.droppedTime();
 }
 
-void Time::setTimeScale(double scale)
+void Time::setTimeScale(float64 scale)
 {
     m_timeScale = std::isfinite(scale) && scale > 0.0 ? scale : 0.0;
 }
 
-double Time::timeScale() const noexcept
+float64 Time::timeScale() const noexcept
 {
     return m_timeScale;
 }
@@ -102,37 +103,37 @@ bool Time::isPaused() const noexcept
     return m_paused;
 }
 
-void Time::setFixedDeltaTime(double fixedDelta)
+void Time::setFixedDeltaTime(float64 fixedDelta)
 {
     m_fixedTimeStep.configure(fixedDelta);
 }
 
-double Time::fixedDeltaTime() const noexcept
+float64 Time::fixedDeltaTime() const noexcept
 {
     return m_fixedTimeStep.deltaTime();
 }
 
-double Time::interpolationAlpha() const noexcept
+float64 Time::interpolationAlpha() const noexcept
 {
     return m_fixedTimeStep.interpolationAlpha();
 }
 
-double Time::deltaTime() const noexcept
+float64 Time::deltaTime() const noexcept
 {
     return m_frameTime.deltaTime;
 }
 
-double Time::unscaledDeltaTime() const noexcept
+float64 Time::unscaledDeltaTime() const noexcept
 {
     return m_frameTime.unscaledDeltaTime;
 }
 
-double Time::elapsedTime() const noexcept
+float64 Time::elapsedTime() const noexcept
 {
     return m_frameTime.elapsedTime;
 }
 
-double Time::unscaledElapsedTime() const noexcept
+float64 Time::unscaledElapsedTime() const noexcept
 {
     return m_frameTime.unscaledElapsedTime;
 }
