@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/memory/adapters/allocator_resource.hpp"
 #include "core/memory/allocator.hpp"
 #include "core/memory/allocation.hpp"
 #include "core/memory/allocators/arena_allocator.hpp"
