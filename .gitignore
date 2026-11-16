@@ -1,0 +1,70 @@
+# --- Build output -------------------------------------------------------
+build/
+out/
+bin/
+lib/
+install/
+
+# --- CMake --------------------------------------------------------------
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+cmake_install.cmake
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+*.cmake.user
+_deps/
+
+# --- Visual Studio ------------------------------------------------------
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.aps
+Debug/
+Release/
+RelWithDebInfo/
+x64/
+x86/
+
+# --- Ninja / Make -------------------------------------------------------
+.ninja_deps
+.ninja_log
+build.ninja
+Makefile
+*.o
+*.obj
+*.a
+*.lib
+*.exp
+*.ilk
+*.pdb
+*.dll
+*.exe
+*.out
+
+# --- Shaders ------------------------------------------------------------
+shaders/compiled/*
+!shaders/compiled/.gitkeep
+*.spv
+
+# --- Assets that are generated rather than authored ---------------------
+assets/**/packed/
+*.asset_compiled
+
+# --- Editors / tooling --------------------------------------------------
+.vscode/
+.idea/
+.clangd/
+.cache/
+*.swp
+*~
+
+# --- OS -----------------------------------------------------------------
+Thumbs.db
+Desktop.ini
+.DS_Store
