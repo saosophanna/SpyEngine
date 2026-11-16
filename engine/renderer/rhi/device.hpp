@@ -5,8 +5,10 @@
 #include <string>
 #include <string_view>
 
+#include "rhi/buffer.hpp"
 #include "rhi/device_capabilities.hpp"
 #include "rhi/native_window.hpp"
+#include "rhi/texture.hpp"
 
 namespace spy::rhi
 {
@@ -45,6 +47,9 @@ public:
         const NativeWindow& window,
         std::uint32_t width,
         std::uint32_t height) = 0;
+
+    [[nodiscard]] virtual std::unique_ptr<Buffer> createBuffer(const BufferDesc& desc) = 0;
+    [[nodiscard]] virtual std::unique_ptr<Texture> createTexture(const TextureDesc& desc) = 0;
 
     [[nodiscard]] virtual DeviceCapabilities capabilities() const = 0;
     [[nodiscard]] virtual bool isValid() const = 0;

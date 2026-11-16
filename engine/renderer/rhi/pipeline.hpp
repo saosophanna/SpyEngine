@@ -34,6 +34,19 @@ enum class CullMode
     Front,
 };
 
+enum class ShaderStage
+{
+    Vertex,
+    Fragment,
+};
+
+enum class DepthMode
+{
+    Disabled,
+    ReadOnly,
+    ReadWrite,
+};
+
 struct VertexAttribute
 {
     std::uint32_t location = 0;
@@ -41,18 +54,26 @@ struct VertexAttribute
     std::uint32_t offset = 0;
 };
 
+struct ShaderModule
+{
+    ShaderStage stage = ShaderStage::Vertex;
+    const void* code = nullptr;
+    std::size_t size = 0;
+};
+
 struct PipelineDesc
 {
-    const void* shaderStage = nullptr;
-    std::size_t shaderSize = 0;
-    VertexAttribute* attributes = nullptr;
+    const ShaderModule* stages = nullptr;
+    std::uint32_t stageCount = 0;
+    const VertexAttribute* attributes = nullptr;
     std::uint32_t attributeCount = 0;
     std::uint32_t vertexStride = 0;
     PrimitiveTopology topology = PrimitiveTopology::TriangleList;
     BlendMode blend = BlendMode::Alpha;
-    CullMode cull = CullMode::Back;
-    bool depthTest = true;
-    bool depthWrite = true;
+    CullMode cull = CullMode::None;
+    DepthMode depth = DepthMode::Disabled;
+    std::uint32_t pushConstantSize = 0;
+    bool hasTexture = true;
 };
 
 class Pipeline

@@ -4,6 +4,7 @@
 
 #include "rhi/command_buffer.hpp"
 #include "rhi/native_window.hpp"
+#include "rhi/pipeline.hpp"
 #include "rhi/swapchain.hpp"
 
 namespace spy::rhi
@@ -28,6 +29,9 @@ public:
     [[nodiscard]] virtual bool endFrame() = 0;
 
     virtual void waitIdle() = 0;
+
+    [[nodiscard]] virtual std::unique_ptr<Pipeline> createPipeline(
+        const PipelineDesc& desc) = 0;
 
     [[nodiscard]] virtual std::uint32_t width() const = 0;
     [[nodiscard]] virtual std::uint32_t height() const = 0;

@@ -12,10 +12,12 @@ endif()
 
 message(STATUS "SpyEngine platform: ${SPY_PLATFORM}")
 
+string(TOUPPER "${SPY_PLATFORM}" SPY_PLATFORM_UPPER)
+
 add_library(spy_platform INTERFACE)
 
 target_compile_definitions(spy_platform INTERFACE
-    SPY_PLATFORM_${SPY_PLATFORM}=1
+    SPY_PLATFORM_${SPY_PLATFORM_UPPER}=1
     $<$<CONFIG:Debug>:SPY_DEBUG=1>
     $<$<CONFIG:Release>:SPY_RELEASE=1>
     $<$<CONFIG:RelWithDebInfo>:SPY_RELEASE=1>)

@@ -1,5 +1,12 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+
+#include "rhi/buffer.hpp"
+#include "rhi/pipeline.hpp"
+#include "rhi/texture.hpp"
+
 namespace spy::rhi
 {
 
@@ -24,6 +31,19 @@ public:
 
     virtual void beginRenderPass(const Color& clearColor) = 0;
     virtual void endRenderPass() = 0;
+
+    virtual void setScissor(std::uint32_t x,
+                            std::uint32_t y,
+                            std::uint32_t width,
+                            std::uint32_t height) = 0;
+
+    virtual void bindPipeline(Pipeline& pipeline) = 0;
+    virtual void bindVertexBuffer(Buffer& buffer) = 0;
+    virtual void bindTexture(Texture& texture, std::uint32_t slot = 0) = 0;
+    virtual void pushConstants(const void* data,
+                               std::uint32_t size,
+                               std::uint32_t offset = 0) = 0;
+    virtual void draw(std::uint32_t vertexCount, std::uint32_t firstVertex = 0) = 0;
 
 protected:
     CommandBuffer() = default;

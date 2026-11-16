@@ -34,14 +34,24 @@ public:
         std::uint32_t width,
         std::uint32_t height) override;
 
+    [[nodiscard]] std::unique_ptr<rhi::Buffer> createBuffer(
+        const rhi::BufferDesc& desc) override;
+    [[nodiscard]] std::unique_ptr<rhi::Texture> createTexture(
+        const rhi::TextureDesc& desc) override;
+
     [[nodiscard]] rhi::DeviceCapabilities capabilities() const override;
     [[nodiscard]] bool isValid() const override;
     [[nodiscard]] std::string_view backendName() const override;
 
 private:
+    [[nodiscard]] bool createDescriptorResources();
+    void destroyDescriptorResources();
+
     VulkanContext m_context;
     rhi::DeviceDesc m_desc{};
     rhi::DeviceCapabilities m_capabilities{};
+    VkDescriptorSetLayout m_textureSetLayout = VK_NULL_HANDLE;
+    VkDescriptorPool m_descriptorPool = VK_NULL_HANDLE;
     bool m_initialized = false;
 };
 

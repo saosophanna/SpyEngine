@@ -10,6 +10,7 @@ namespace spy::vulkan
 {
 
 class VulkanContext;
+class VulkanPipeline;
 
 class VulkanCommandBuffer final : public rhi::CommandBuffer
 {
@@ -28,12 +29,26 @@ public:
     void beginRenderPass(const rhi::Color& clearColor) override;
     void endRenderPass() override;
 
+    void setScissor(std::uint32_t x,
+                    std::uint32_t y,
+                    std::uint32_t width,
+                    std::uint32_t height) override;
+
+    void bindPipeline(rhi::Pipeline& pipeline) override;
+    void bindVertexBuffer(rhi::Buffer& buffer) override;
+    void bindTexture(rhi::Texture& texture, std::uint32_t slot = 0) override;
+    void pushConstants(const void* data,
+                       std::uint32_t size,
+                       std::uint32_t offset = 0) override;
+    void draw(std::uint32_t vertexCount, std::uint32_t firstVertex = 0) override;
+
     void setRenderTarget(VkRenderPass renderPass, VkFramebuffer framebuffer, VkExtent2D extent);
 
     [[nodiscard]] VkCommandBuffer handle() const noexcept { return m_commandBuffer; }
 
 private:
     VulkanContext* m_context = nullptr;
+    VulkanPipeline* m_pipeline = nullptr;
     VkCommandPool m_pool = VK_NULL_HANDLE;
     VkCommandBuffer m_commandBuffer = VK_NULL_HANDLE;
     VkRenderPass m_renderPass = VK_NULL_HANDLE;

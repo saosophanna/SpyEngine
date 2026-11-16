@@ -11,6 +11,11 @@ include(BuildOptions)
 include(Platform)
 include(CompilerOptions)
 include(Dependencies)
+include(Shaders)
+
+if(SPY_ENABLE_VULKAN)
+    spy_add_shader_target(spy_shaders)
+endif()
 
 add_subdirectory(engine)
 

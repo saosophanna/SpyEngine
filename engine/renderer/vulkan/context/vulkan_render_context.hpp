@@ -21,7 +21,9 @@ class VulkanContext;
 class VulkanRenderContext final : public rhi::RenderContext
 {
 public:
-    VulkanRenderContext(VulkanContext& context, const rhi::DeviceDesc& desc);
+    VulkanRenderContext(VulkanContext& context,
+                        const rhi::DeviceDesc& desc,
+                        VkDescriptorSetLayout textureSetLayout);
     ~VulkanRenderContext() override;
 
     VulkanRenderContext(const VulkanRenderContext&) = delete;
@@ -38,6 +40,9 @@ public:
     [[nodiscard]] bool endFrame() override;
 
     void waitIdle() override;
+
+    [[nodiscard]] std::unique_ptr<rhi::Pipeline> createPipeline(
+        const rhi::PipelineDesc& desc) override;
 
     [[nodiscard]] std::uint32_t width() const override;
     [[nodiscard]] std::uint32_t height() const override;
@@ -63,6 +68,7 @@ private:
 
     VulkanContext* m_context = nullptr;
     VulkanSwapchain m_swapchain;
+    VkDescriptorSetLayout m_textureSetLayout = VK_NULL_HANDLE;
     std::vector<Frame> m_frames;
     std::vector<std::unique_ptr<VulkanSemaphore>> m_renderFinished;
     std::uint32_t m_currentFrame = 0;

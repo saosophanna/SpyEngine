@@ -14,3 +14,12 @@ add_custom_command(TARGET fruit_spin POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/config"
             "$<TARGET_FILE_DIR:fruit_spin>/config")
+
+if(TARGET spy_shaders)
+    add_dependencies(fruit_spin spy_shaders)
+
+    add_custom_command(TARGET fruit_spin POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${CMAKE_BINARY_DIR}/shaders"
+                "$<TARGET_FILE_DIR:fruit_spin>/shaders")
+endif()

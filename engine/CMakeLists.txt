@@ -33,3 +33,7 @@ add_library(SpyEngine::Engine ALIAS SpyEngine)
 
 target_include_directories(SpyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(SpyEngine PUBLIC ${SPY_ENGINE_DEPS} SpyRenderer SpyLogging)
+
+if(WIN32)
+    target_link_libraries(SpyEngine PRIVATE user32)
+endif()

@@ -3,6 +3,9 @@
 #include "vulkan/commands/vulkan_command_buffer.hpp"
 
 #include "vulkan/context/vulkan_context.hpp"
+#include "vulkan/resources/vulkan_buffer.hpp"
+#include "vulkan/resources/vulkan_pipeline.hpp"
+#include "vulkan/resources/vulkan_texture.hpp"
 
 namespace spy::vulkan
 {
@@ -60,6 +63,7 @@ void VulkanCommandBuffer::shutdown()
     m_extent = VkExtent2D{};
     m_recording = false;
     m_renderPassActive = false;
+    m_pipeline = nullptr;
     m_context = nullptr;
 }
 
@@ -87,6 +91,7 @@ bool VulkanCommandBuffer::begin()
 
     m_recording = true;
     m_renderPassActive = false;
+    m_pipeline = nullptr;
     return true;
 }
 
@@ -172,6 +177,109 @@ void VulkanCommandBuffer::setRenderTarget(VkRenderPass renderPass,
     m_renderPass = renderPass;
     m_framebuffer = framebuffer;
     m_extent = extent;
+}
+
+void VulkanCommandBuffer::setScissor(std::uint32_t x,
+                                     std::uint32_t y,
+                                     std::uint32_t width,
+                                     std::uint32_t height)
+{
+    if (!m_recording)
+    {
+        return;
+    }
+
+    VkRect2D scissor{};
+    scissor.offset = {static_cast<std::int32_t>(x), static_cast<std::int32_t>(y)};
+    scissor.extent = {width, height};
+    vkCmdSetScissor(m_commandBuffer, 0, 1, &scissor);
+}
+
+void VulkanCommandBuffer::bindPipeline(rhi::Pipeline& pipeline)
+{
+    if (!m_recording)
+    {
+        return;
+    }
+
+    auto* vulkanPipeline = dynamic_cast<VulkanPipeline*>(&pipeline);
+
+    if (vulkanPipeline == nullptr || !vulkanPipeline->isValid())
+    {
+        return;
+    }
+
+    m_pipeline = vulkanPipeline;
+    vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanPipeline->handle());
+}
+
+void VulkanCommandBuffer::bindVertexBuffer(rhi::Buffer& buffer)
+{
+    if (!m_recording || m_pipeline == nullptr)
+    {
+        return;
+    }
+
+    auto* vulkanBuffer = dynamic_cast<VulkanBuffer*>(&buffer);
+
+    if (vulkanBuffer == nullptr)
+    {
+        return;
+    }
+
+    const VkDeviceSize offset = 0;
+    const VkBuffer handle = vulkanBuffer->handle();
+    vkCmdBindVertexBuffers(m_commandBuffer, 0, 1, &handle, &offset);
+}
+
+void VulkanCommandBuffer::bindTexture(rhi::Texture& texture, std::uint32_t slot)
+{
+    if (!m_recording || m_pipeline == nullptr || m_pipeline->layout() == VK_NULL_HANDLE)
+    {
+        return;
+    }
+
+    auto* vulkanTexture = dynamic_cast<VulkanTexture*>(&texture);
+
+    if (vulkanTexture == nullptr || vulkanTexture->descriptorSet() == VK_NULL_HANDLE)
+    {
+        return;
+    }
+
+    const VkDescriptorSet descriptorSet = vulkanTexture->descriptorSet();
+    vkCmdBindDescriptorSets(m_commandBuffer,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            m_pipeline->layout(),
+                            slot,
+                            1,
+                            &descriptorSet,
+                            0,
+                            nullptr);
+}
+
+void VulkanCommandBuffer::pushConstants(const void* data, std::uint32_t size, std::uint32_t offset)
+{
+    if (!m_recording || m_pipeline == nullptr || data == nullptr || size == 0)
+    {
+        return;
+    }
+
+    vkCmdPushConstants(m_commandBuffer,
+                       m_pipeline->layout(),
+                       VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                       offset,
+                       size,
+                       data);
+}
+
+void VulkanCommandBuffer::draw(std::uint32_t vertexCount, std::uint32_t firstVertex)
+{
+    if (!m_recording || m_pipeline == nullptr || vertexCount == 0)
+    {
+        return;
+    }
+
+    vkCmdDraw(m_commandBuffer, vertexCount, 1, firstVertex, 0);
 }
 
 }

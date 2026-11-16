@@ -8,12 +8,16 @@
 #include "core/logging/log_macros.hpp"
 
 #include "vulkan/context/vulkan_context.hpp"
+#include "vulkan/resources/vulkan_pipeline.hpp"
 
 namespace spy::vulkan
 {
 
-VulkanRenderContext::VulkanRenderContext(VulkanContext& context, const rhi::DeviceDesc& desc)
+VulkanRenderContext::VulkanRenderContext(VulkanContext& context,
+                                         const rhi::DeviceDesc& desc,
+                                         VkDescriptorSetLayout textureSetLayout)
     : m_context(&context)
+    , m_textureSetLayout(textureSetLayout)
     , m_framesInFlight(std::clamp<std::uint32_t>(desc.framesInFlight, 1, 3))
     , m_vsync(desc.enableVsync)
 {
@@ -224,6 +228,27 @@ void VulkanRenderContext::waitIdle()
     {
         m_context->waitIdle();
     }
+}
+
+std::unique_ptr<rhi::Pipeline> VulkanRenderContext::createPipeline(
+    const rhi::PipelineDesc& desc)
+{
+    if (!m_initialized || m_context == nullptr)
+    {
+        return nullptr;
+    }
+
+    auto pipeline = std::make_unique<VulkanPipeline>();
+
+    if (!pipeline->initialize(*m_context,
+                              desc,
+                              m_swapchain.renderPass(),
+                              m_textureSetLayout))
+    {
+        return nullptr;
+    }
+
+    return pipeline;
 }
 
 std::uint32_t VulkanRenderContext::width() const
