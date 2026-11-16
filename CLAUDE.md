@@ -47,3 +47,50 @@ Presets: `windows-msvc`, `windows-ninja`, `linux-ninja`. Binaries land in `build
 | `third_party/` | Vendored libraries, resolved local-first |
 | `tools/` | Shader compiler, asset compiler, asset packer |
 | `tests/` | Unit tests, one `*_test.cpp` per suite |
+
+## Module Dependency Guidelines
+
+SpyEngine modules must follow a **one-way dependency architecture** to maintain modularity, reusability, and testability.
+
+### Core Rules
+
+1. **Foundation modules must remain independent.** They must not depend on Platform, Renderer, ECS, or game-specific modules.
+2. **Dependencies flow downward.** Higher-level modules may depend on lower-level modules, but lower-level modules must never depend on higher-level modules.
+3. **Avoid circular dependencies.** If two modules need to communicate, use interfaces, events, or dependency injection.
+4. **Prefer interfaces over implementations.** Depend on abstractions rather than concrete backend classes.
+5. **Keep modules independently testable.** Each module should compile and run its unit tests without requiring unrelated engine modules.
+6. **Declare dependencies explicitly.** Every module must list its required CMake targets and public dependencies.
+
+### Foundation Dependencies
+
+- Utilities: No engine module dependencies.
+- Math: Depends on Utilities.
+- Time: Depends on Utilities.
+- Memory: Depends on Utilities.
+- Events: Depends on Utilities.
+- Lifecycle: Depends on Utilities and may use Time for update scheduling.
+
+### Architecture Rule
+
+```text
+Higher-Level Modules
+        |
+        v
+Engine Systems
+        |
+        v
+Foundation
+        |
+        v
+C++ Standard Library
+```
+
+### Important
+
+- Never introduce circular dependencies.
+- Do not use global access to bypass module dependencies.
+- Do not expose platform-specific or renderer-specific types in Foundation APIs.
+- Use Events or interfaces when modules need indirect communication.
+- Keep public headers free from unnecessary implementation dependencies.
+
+**Goal:** Every module should have a clear responsibility, explicit dependencies, and the ability to evolve independently without breaking unrelated modules.
